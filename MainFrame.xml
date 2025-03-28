@@ -9,7 +9,7 @@
                         <Anchor point="BOTTOMRIGHT"/>
                     </Anchors>
                 </Texture>
-                <FontString parentKey="Label" inherits="GameFontNormal">
+                <FontString parentKey="Label" inherits="SystemFont_Outline">
                     <Anchors>
                         <Anchor point="LEFT"/>
                         <Anchor point="RIGHT"/>
@@ -27,6 +27,16 @@
             <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent" />
         </Anchors>
         <Frames>
+            <DropdownButton parentKey="Stat1Search" inherits="WowStyle1DropdownTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="130" y="-30"/>
+                </Anchors>
+            </DropdownButton>
+            <DropdownButton parentKey="Stat2Search" inherits="WowStyle1DropdownTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.Stat1Search" relativePoint="RIGHT" x="10"/>
+                </Anchors>
+            </DropdownButton>
             <DropdownButton parentKey="Filter" inherits="WowStyle1DropdownTemplate">
                 <Anchors>
                     <Anchor point="TOPRIGHT" x="-24" y="-30" />
@@ -44,6 +54,15 @@
                 </Scripts>
             </Button>
         </Frames>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString text="Search" inherits="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeKey="$parent.Stat1Search" relativePoint="LEFT" x="-10"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnMouseDown>

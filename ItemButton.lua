@@ -7,6 +7,7 @@ local private = select(2, ...)
 ---@field Border Texture
 ---@field Stat1 FontString
 ---@field Stat2 FontString
+---@field AutoCastOverlay any
 MPLM_ItemButtonMixin = {}
 
 ---@param itemInfo EncounterJournalItemInfo
@@ -19,12 +20,31 @@ function MPLM_ItemButtonMixin:Init(itemInfo)
     self:CheckItemButtonTooltip();
 end
 
-local StatsShortened = {
-    ITEM_MOD_CRIT_RATING_SHORT = "Crit.",
-    ITEM_MOD_HASTE_RATING_SHORT = "Haste",
-    ITEM_MOD_MASTERY_RATING_SHORT = "Mast.",
-    ITEM_MOD_VERSATILITY = "Vers.",
-}
+function MPLM_ItemButtonMixin:Reset()
+    self.itemInfo = nil
+    self:HideStrongHighlight()
+    self:HideWeakHighlight()
+end
+
+function MPLM_ItemButtonMixin:ShowStrongHighlight()
+    self:HideWeakHighlight()
+    ActionButton_ShowOverlayGlow(self)
+end
+
+function MPLM_ItemButtonMixin:HideStrongHighlight()
+    ActionButton_HideOverlayGlow(self)
+end
+
+function MPLM_ItemButtonMixin:ShowWeakHighlight()
+    self:HideStrongHighlight()
+    self.AutoCastOverlay:SetShown(true);
+    self.AutoCastOverlay:ShowAutoCastEnabled(true);
+end
+
+function MPLM_ItemButtonMixin:HideWeakHighlight()
+    self.AutoCastOverlay:ShowAutoCastEnabled(false);
+    self.AutoCastOverlay:SetShown(false);
+end
 
 function MPLM_ItemButtonMixin:UpdateStats()
     if self.itemInfo.link then
@@ -32,7 +52,7 @@ function MPLM_ItemButtonMixin:UpdateStats()
 
         local statInfo = {}
         for stat, value in pairs(stats) do
-            local statName = StatsShortened[stat]
+            local statName = private.statsShortened[stat]
             if statName then
                 tinsert(statInfo, {statName = statName, value = value})
             end
@@ -99,6 +119,8 @@ function MPLM_ItemButtonMixin:OnUpdate()
 end
 
 function MPLM_ItemButtonMixin:ShowItemTooltip()
+    if not self.itemInfo then return end
+
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
     -- itemLink may not be available until after a GET_ITEM_INFO_RECEIVED event
     if self.itemInfo.link then

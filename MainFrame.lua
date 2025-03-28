@@ -22,17 +22,23 @@ end
 ---@class MPLM_MainFrame : Frame
 ---@field Filter Frame
 ---@field SetPortraitToAsset fun(self, texturePath: string)
+---@field Stat1Search any
+---@field Stat2Search any
 MPLM_MainFrameMixin = {}
 
 function MPLM_MainFrameMixin:OnLoad()
+    -- this is required for the SpellBookItemAutoCastTemplate to be available
+    PlayerSpellsFrame_LoadUI();
+
     self:SetPortraitToAsset([[Interface\EncounterJournal\UI-EJ-PortraitIcon]]);
     self:SetupFilterDropdown()
+    self:SetupStatSearchDropdown()
 
     self:RegisterEvent("EJ_LOOT_DATA_RECIEVED")
 
     self.dungeonHeaderPool = CreateFramePool("Frame", self, "MPLM_DungeonHeaderTemplate")
     self.slotHeaderPool = CreateFontStringPool(self, "OVERLAY", 0, "GameFontNormal")
-    self.itemButtonPool = CreateFramePool("Button", self, "MPLM_ItemButtonTemplate")
+    self.itemButtonPool = CreateFramePool("Button", self, "MPLM_ItemButtonTemplate", function(pool, button) button:Reset() end)
 
     ---@type table<number, EncounterJournalItemInfo>
     self.itemCache = {}
@@ -63,9 +69,10 @@ end
 function MPLM_MainFrameMixin:DoScan()
     self.dungeonInfos = self:ScanDungeons()
     self:BuildMatrix()
+    self:UpdateSearchGlow()
 end
 
-do
+function MPLM_MainFrameMixin:SetupFilterDropdown()
     local function GetClassFilter()
         local filterClassID, filterSpecID = EJ_GetLootFilter();
         return filterClassID;
@@ -81,11 +88,72 @@ do
         if EncounterJournal_OnFilterChanged then
             EncounterJournal_OnFilterChanged(EncounterJournal);
         end
+        self:DoScan()
     end
 
-    function MPLM_MainFrameMixin:SetupFilterDropdown()
-        local dropdown = self.Filter;
-        ClassMenu.InitClassSpecDropdown(dropdown, GetClassFilter, GetSpecFilter, SetClassAndSpecFilter);
+    ClassMenu.InitClassSpecDropdown(self.Filter, GetClassFilter, GetSpecFilter, SetClassAndSpecFilter);
+end
+
+function MPLM_MainFrameMixin:SetupStatSearchDropdown()
+    do
+        local function IsSelected(value)
+            return self.stat1SearchValue == value
+        end
+
+        local function SetSelected(value)
+            self.stat1SearchValue = value
+            self:UpdateSearchGlow()
+        end
+
+        self.Stat1Search:SetupMenu(function(dropdown, rootDescription)
+            rootDescription:CreateRadio("None", IsSelected, SetSelected, nil);
+
+            for key, shortName in pairs(private.statsShortened) do
+                rootDescription:CreateRadio(_G[key], IsSelected, SetSelected, key);
+            end
+        end);
+    end
+
+    do
+        local function IsSelected(value)
+            return self.stat2SearchValue == value
+        end
+
+        local function SetSelected(value)
+            self.stat2SearchValue = value
+            self:UpdateSearchGlow()
+        end
+
+        self.Stat2Search:SetupMenu(function(dropdown, rootDescription)
+            rootDescription:CreateRadio("None", IsSelected, SetSelected, nil);
+
+            for key, shortName in pairs(private.statsShortened) do
+                rootDescription:CreateRadio(_G[key], IsSelected, SetSelected, key);
+            end
+        end);
+    end
+end
+
+function MPLM_MainFrameMixin:UpdateSearchGlow()
+    for button in self.itemButtonPool:EnumerateActive() --[[@as fun(): MPLM_ItemButton]] do
+        if button.itemInfo.link then
+            local stats = C_Item.GetItemStats(button.itemInfo.link)
+            local stat1Value = stats[self.stat1SearchValue]
+            local stat2Value = stats[self.stat2SearchValue]
+            if stat1Value and stat2Value then
+                button:ShowStrongHighlight()
+            else
+                if stat1Value or stat2Value then
+                    button:ShowWeakHighlight()
+                else
+                    button:HideWeakHighlight()
+                    button:HideStrongHighlight()
+                end
+            end
+        else
+            button:HideStrongHighlight()
+            button:HideWeakHighlight()
+        end
     end
 end
 
@@ -146,7 +214,7 @@ function MPLM_MainFrameMixin:BuildMatrix()
             local slotHeader = self.slotHeaderPool:Acquire() --[[@as FontString]]
             slotHeader:SetText(name)
             slotHeader:SetWidth(64)
-            slotHeader:SetPoint("TOPLEFT", self, "TOPLEFT", currentXOffset, -80)
+            slotHeader:SetPoint("BOTTOMLEFT", self, "TOPLEFT", currentXOffset, -90)
             slotHeader:Show()
             slotToXOffset[filter] = currentXOffset
             currentXOffset = currentXOffset + slotHeader:GetWidth() + 5

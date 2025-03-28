@@ -34,6 +34,14 @@
                 </FontString>
             </Layer>
         </Layers>
+        <Frames>
+            <Frame parentKey="AutoCastOverlay" inherits="SpellBookItemAutoCastTemplate" hidden="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                    <Anchor point="BOTTOMRIGHT"/>
+                </Anchors>
+            </Frame>
+        </Frames>
         <Scripts>
             <OnEnter method="OnEnter"/>
             <OnLeave method="OnLeave"/>
