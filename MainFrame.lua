@@ -48,9 +48,6 @@ function MPLM_MainFrameMixin:OnLoad()
     ---@type table<number, EncounterJournalItemInfo>
     self.itemCache = {}
 
-    ---@type table<number, {index: number, instanceId: number}>
-    self.unloadedItems = {}
-
     ---@type DungeonInfo[]
     self.dungeonInfos = {}
 end
@@ -65,16 +62,11 @@ end
 
 function MPLM_MainFrameMixin:OnEvent(event, ...)
     if event == "EJ_LOOT_DATA_RECIEVED" then
-        local itemID = ...;
-        local unloadedItemInfo = self.unloadedItems[itemID]
-        if unloadedItemInfo then
-            EJ_SelectInstance(unloadedItemInfo.instanceId)
-            local lootInfo = C_EncounterJournal.GetLootInfoByIndex(unloadedItemInfo.index)
-            if lootInfo and lootInfo.name then
-                private.addon:Print("Received loot data: " .. lootInfo.name)
-                self.itemCache[lootInfo.itemID] = lootInfo
-                self.unloadedItems[itemID] = nil
-            end
+        if not self.RescanTimer then
+            self.RescanTimer = C_Timer.NewTimer(0.2, function()
+                self:DoScan()
+                self.RescanTimer = nil
+            end)
         end
     end
 end
@@ -235,8 +227,6 @@ function MPLM_MainFrameMixin:BuildMatrix()
     end
 
 	local isLootSlotPresent = self:GetLootSlotsPresent();
-
-
     local slotToHeader = {}
     for filter, name in pairs(SlotFilterToSlotName) do
         if isLootSlotPresent[filter] then
@@ -375,12 +365,6 @@ function MPLM_MainFrameMixin:ScanDungeons()
                 if lootInfo.name then
                     --private.addon:Print("Found loot: " .. lootInfo.name)
                     self.itemCache[lootInfo.itemID] = lootInfo
-                else
-                    --private.addon:Print("Wait for loot data: " .. lootInfo.itemID)
-                    self.unloadedItems[lootInfo.itemID] = {
-                        index = i,
-                        instanceId = instanceId,
-                    }
                 end
             end
         end
