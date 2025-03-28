@@ -1,0 +1,58 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Script file="MainFrame.lua" />
+    <Frame name="MPLM_DungeonHeaderTemplate" mixin="MPLM_DungeonHeaderMixin" virtual="true">
+        <Layers>
+            <Layer level="OVERLAY">
+                <Texture parentKey="Image">
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
+                </Texture>
+                <FontString parentKey="Label" inherits="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="LEFT"/>
+                        <Anchor point="RIGHT"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <Frame name="MPLM_MainFrame" parent="UIParent" inherits="PortraitFrameFlatTemplate"
+        mixin="MPLM_MainFrameMixin" enableMouse="true" movable="true" clampedToScreen="true"
+        hidden="true">
+        <Size x="1100" y="670" />
+        <Anchors>
+            <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent" />
+        </Anchors>
+        <Frames>
+            <DropdownButton parentKey="Filter" inherits="WowStyle1DropdownTemplate">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" x="-24" y="-30" />
+                </Anchors>
+            </DropdownButton>
+            <Button text="Scan" parentKey="ScanButton" inherits="UIPanelButtonTemplate">
+                <Size x="80" y="22"/>
+                <Anchors>
+                    <Anchor point="RIGHT" relativePoint="LEFT" x="-10" relativeKey="$parent.Filter"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        self:GetParent():DoScan()
+                    </OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnMouseDown>
+                self:StartMoving()
+            </OnMouseDown>
+            <OnMouseUp>
+                self:StopMovingOrSizing()
+            </OnMouseUp>
+            <OnEvent method="OnEvent"/>
+        </Scripts>
+    </Frame>
+</Ui>

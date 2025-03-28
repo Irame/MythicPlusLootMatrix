@@ -1,0 +1,28 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Script file="ItemButton.lua" />
+    <Button name="MPLM_ItemButtonTemplate" mixin="MPLM_ItemButtonMixin" virtual="true">
+        <Size x="32" y="32"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Icon">
+                    <Size x="28" y="28"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="BORDER">
+                <Texture parentKey="Border" atlas="loottab-set-itemborder-green" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeKey="$parent.Icon" relativePoint="CENTER" x="20" y="1"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnEnter method="OnEnter"/>
+            <OnLeave method="OnLeave"/>
+            <OnClick method="OnClick"/>
+        </Scripts>
+    </Button>
+</Ui>
