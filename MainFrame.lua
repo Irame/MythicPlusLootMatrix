@@ -39,7 +39,7 @@ function MPLM_MainFrameMixin:OnLoad()
 
     self:RegisterEvent("EJ_LOOT_DATA_RECIEVED")
 
-    self.ResizeButton:Init(self, 1100, 670);
+    self.ResizeButton:Init(self, 1100, 670, 1100*1.5, 670*1.5);
 
     self.dungeonHeaderPool = CreateFramePool("Frame", self, "MPLM_DungeonHeaderTemplate")
     self.slotHeaderPool = CreateFramePool("Frame", self, "MPLM_SlotHeaderTemplate")
