@@ -25,6 +25,8 @@ function MPLM_ItemButtonMixin:Reset()
     self.itemInfo = nil
     self:HideStrongHighlight()
     self:HideWeakHighlight()
+    self:Hide()
+    self:ClearAllPoints()
 end
 
 function MPLM_ItemButtonMixin:ShowStrongHighlight()
