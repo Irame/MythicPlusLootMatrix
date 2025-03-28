@@ -8,6 +8,7 @@ local private = select(2, ...)
 ---@field Stat1 FontString
 ---@field Stat2 FontString
 ---@field AutoCastOverlay any
+---@field SpellActivationAlert? Frame
 MPLM_ItemButtonMixin = {}
 
 ---@param itemInfo EncounterJournalItemInfo
@@ -28,6 +29,12 @@ end
 
 function MPLM_ItemButtonMixin:ShowStrongHighlight()
     self:HideWeakHighlight()
+    if not self.SpellActivationAlert then
+		ActionButton_SetupOverlayGlow(self)
+        local width, height = self:GetSize()
+        self.SpellActivationAlert.ProcStartFlipbook:SetSize(width*3.5, height*3.5)
+	end
+
     ActionButton_ShowOverlayGlow(self)
 end
 
@@ -146,4 +153,15 @@ end
 
 function MPLM_ItemButtonMixin:OnClick()
     HandleModifiedItemClick(self.itemInfo and self.itemInfo.link);
+end
+
+function MPLM_ItemButtonMixin:OnSizeChanged(width, height)
+    local minDimSize = math.min(width, height)
+    self.Border:SetScale(minDimSize/32)
+    self.Icon:SetScale(minDimSize/32)
+
+    if self.SpellActivationAlert then
+        self.SpellActivationAlert:SetSize(width * 1.4, height * 1.4)
+        self.SpellActivationAlert.ProcStartFlipbook:SetSize(width*3.5, height*3.5)
+    end
 end

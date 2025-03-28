@@ -46,6 +46,7 @@
             <OnEnter method="OnEnter"/>
             <OnLeave method="OnLeave"/>
             <OnClick method="OnClick"/>
+            <OnSizeChanged method="OnSizeChanged"/>
         </Scripts>
     </Button>
 </Ui>

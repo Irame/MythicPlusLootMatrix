@@ -61,6 +61,7 @@
         "ITEM_MOD_VERSATILITY",
         "ActionButton_ShowOverlayGlow",
         "ActionButton_HideOverlayGlow",
-        "PlayerSpellsFrame_LoadUI"
+        "PlayerSpellsFrame_LoadUI",
+        "ActionButton_SetupOverlayGlow"
     ]
 }

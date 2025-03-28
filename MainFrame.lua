@@ -80,7 +80,9 @@ function MPLM_MainFrameMixin:OnEvent(event, ...)
 end
 
 function MPLM_MainFrameMixin:OnSizeChanged()
-    self:LayoutMatrix(self.matrixFrames)
+    if self.matrixFrames then
+        self:LayoutMatrix(self.matrixFrames)
+    end
 end
 
 function MPLM_MainFrameMixin:DoScan()
