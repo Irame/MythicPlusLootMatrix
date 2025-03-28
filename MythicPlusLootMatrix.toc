@@ -2,6 +2,7 @@
 ## Title: Mythic Plus Loot Matrix
 ## Notes: Provides an overview of mythic plus loot.
 ## Version: @project-version@
+## IconTexture: Interface\AddOns\MythicPlusLootMatrix\Images\Icon
 ## AddonCompartmentFunc: MPLM_OnAddonCompartmentClick
 
 # External code + initialization
