@@ -203,40 +203,49 @@ function MPLM_MainFrameMixin:BuildMatrix()
     self.slotHeaderPool:ReleaseAll()
     self.itemButtonPool:ReleaseAll()
 
-    local currentYOffset = -95
-    local dungeonToYOffset = {}
+    local dungeonToHeader = {}
+    local lastDungeonHeader = nil
     for i, dungeonInfo in ipairs(self.dungeonInfos) do
         local dungeonHeader = self.dungeonHeaderPool:Acquire() --[[@as MPLM_DungeonHeader]]
         dungeonHeader:SetHeight(69)
-        dungeonHeader:SetPoint("TOPLEFT", self, "TOPLEFT", 10, currentYOffset)
+        if lastDungeonHeader then
+            dungeonHeader:SetPoint("TOPLEFT", lastDungeonHeader, "BOTTOMLEFT", 0, 0)
+        else
+            dungeonHeader:SetPoint("TOPLEFT", 10, -95)
+        end
+
         dungeonHeader:SetPoint("RIGHT", -10, 0)
         dungeonHeader:Init(dungeonInfo)
         dungeonHeader:Show()
 
-        dungeonToYOffset[dungeonInfo.id] = currentYOffset - 5
-        currentYOffset = currentYOffset - dungeonHeader:GetHeight()
+        dungeonToHeader[dungeonInfo.id] = dungeonHeader
+        lastDungeonHeader = dungeonHeader
     end
 
 	local isLootSlotPresent = self:GetLootSlotsPresent();
-    local currentXOffset = 75
-    local slotToXOffset = {}
+    local slotToHeader = {}
+    local lastSlotHeader = nil
     for filter, name in pairs(SlotFilterToSlotName) do
         if isLootSlotPresent[filter] then
             local slotHeader = self.slotHeaderPool:Acquire() --[[@as MPLM_SlotHeader]]
             slotHeader.Label:SetText(name)
             slotHeader:SetWidth(69)
-            slotHeader:SetPoint("TOPLEFT", currentXOffset, -90)
+            if lastSlotHeader then
+                slotHeader:SetPoint("TOPLEFT", lastSlotHeader, "TOPRIGHT", 0, 0)
+            else
+                slotHeader:SetPoint("TOPLEFT", 75, -90)
+            end
             slotHeader:SetPoint("BOTTOM", 0, 10)
             slotHeader:Show()
 
-            slotToXOffset[filter] = currentXOffset + 5
-            currentXOffset = currentXOffset + slotHeader:GetWidth()
+            slotToHeader[filter] = slotHeader
+            lastSlotHeader = slotHeader
         end
     end
 
     local itemButtons = {}
     for i, dungeonInfo in ipairs(self.dungeonInfos) do
-        local dungeonYOffset = dungeonToYOffset[dungeonInfo.id]
+        local dungeonHeader = dungeonToHeader[dungeonInfo.id]
 
         for j, itemId in ipairs(dungeonInfo.loot) do
             local itemInfo = self.itemCache[itemId]
@@ -252,9 +261,10 @@ function MPLM_MainFrameMixin:BuildMatrix()
                 local itemButton = self.itemButtonPool:Acquire() --[[@as MPLM_ItemButton]]
                 itemButton:Init(itemInfo)
 
-                local xOffset = slotToXOffset[itemInfo.filterType] + ((#currentButtons)%2 * 32)
-                local yOffset = dungeonYOffset - (math.floor((#currentButtons)/2) * 32)
-                itemButton:SetPoint("TOPLEFT", self, "TOPLEFT", xOffset, yOffset)
+                local xOffset = ((#currentButtons)%2 * 32) + 5
+                local yOffset = -(math.floor((#currentButtons)/2) * 32) - 5
+                itemButton:SetPoint("LEFT", slotToHeader[itemInfo.filterType], "LEFT", xOffset, 0)
+                itemButton:SetPoint("TOP", dungeonHeader, "TOP", 0, yOffset)
                 itemButton:Show()
 
                 tinsert(currentButtons, itemButton)
