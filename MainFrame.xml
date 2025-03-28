@@ -5,16 +5,48 @@
             <Layer level="OVERLAY">
                 <Texture parentKey="Image">
                     <Anchors>
-                        <Anchor point="TOPLEFT"/>
-                        <Anchor point="BOTTOMRIGHT"/>
+                        <Anchor point="TOPLEFT" y="-5"/>
+                        <Anchor point="BOTTOMLEFT"/>
                     </Anchors>
                 </Texture>
                 <FontString parentKey="Label" inherits="SystemFont_Outline">
                     <Anchors>
-                        <Anchor point="LEFT"/>
-                        <Anchor point="RIGHT"/>
+                        <Anchor point="LEFT" relativeKey="$parent.Image"/>
+                        <Anchor point="RIGHT" relativeKey="$parent.Image"/>
                     </Anchors>
                 </FontString>
+            </Layer>
+            <Layer level="BORDER">
+                <Texture atlas="_UI-HUD-ActionBar-Frame-Divider-Threeslice-Center" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativeKey="$parent.Image" relativePoint="TOPLEFT" y="-4.5"/>
+                        <Anchor point="RIGHT"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnSizeChanged method="OnSizeChanged"/>
+        </Scripts>
+    </Frame>
+
+    <Frame name="MPLM_SlotHeaderTemplate" virtual="true">
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString parentKey="Label" inherits="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" x="5"/>
+                        <Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+            <Layer level="BORDER">
+                <Texture atlas="!UI-HUD-ActionBar-Frame-Divider-ThreeSlice-Center" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="-3.5"/>
+                        <Anchor point="BOTTOM"/>
+                    </Anchors>
+                </Texture>
             </Layer>
         </Layers>
     </Frame>

@@ -19,6 +19,13 @@ function MPLM_DungeonHeaderMixin:Init(dungeonInfo)
     self.Label:SetText(dungeonInfo.name)
 end
 
+function MPLM_DungeonHeaderMixin:OnSizeChanged(width, height)
+    self.Image:SetWidth(height-5);
+end
+
+---@class MPLM_SlotHeader : Frame
+---@field Label FontString
+
 ---@class MPLM_MainFrame : Frame
 ---@field Filter Frame
 ---@field SetPortraitToAsset fun(self, texturePath: string)
@@ -32,7 +39,7 @@ function MPLM_MainFrameMixin:OnLoad()
     self:RegisterEvent("EJ_LOOT_DATA_RECIEVED")
 
     self.dungeonHeaderPool = CreateFramePool("Frame", self, "MPLM_DungeonHeaderTemplate")
-    self.slotHeaderPool = CreateFontStringPool(self, "OVERLAY", 0, "GameFontNormal")
+    self.slotHeaderPool = CreateFramePool("Frame", self, "MPLM_SlotHeaderTemplate")
     self.itemButtonPool = CreateFramePool("Button", self, "MPLM_ItemButtonTemplate", function(pool, button) button:Reset() end)
 
     ---@type table<number, EncounterJournalItemInfo>
@@ -196,31 +203,34 @@ function MPLM_MainFrameMixin:BuildMatrix()
     self.slotHeaderPool:ReleaseAll()
     self.itemButtonPool:ReleaseAll()
 
-    local currentYOffset = -100
+    local currentYOffset = -95
     local dungeonToYOffset = {}
     for i, dungeonInfo in ipairs(self.dungeonInfos) do
         local dungeonHeader = self.dungeonHeaderPool:Acquire() --[[@as MPLM_DungeonHeader]]
-        dungeonHeader:SetSize(64, 64)
+        dungeonHeader:SetHeight(69)
         dungeonHeader:SetPoint("TOPLEFT", self, "TOPLEFT", 10, currentYOffset)
+        dungeonHeader:SetPoint("RIGHT", -10, 0)
         dungeonHeader:Init(dungeonInfo)
         dungeonHeader:Show()
 
-        dungeonToYOffset[dungeonInfo.id] = currentYOffset
-        currentYOffset = currentYOffset - 69
+        dungeonToYOffset[dungeonInfo.id] = currentYOffset - 5
+        currentYOffset = currentYOffset - dungeonHeader:GetHeight()
     end
 
 	local isLootSlotPresent = self:GetLootSlotsPresent();
-    local currentXOffset = 80
+    local currentXOffset = 75
     local slotToXOffset = {}
     for filter, name in pairs(SlotFilterToSlotName) do
         if isLootSlotPresent[filter] then
-            local slotHeader = self.slotHeaderPool:Acquire() --[[@as FontString]]
-            slotHeader:SetText(name)
-            slotHeader:SetWidth(64)
-            slotHeader:SetPoint("BOTTOMLEFT", self, "TOPLEFT", currentXOffset, -90)
+            local slotHeader = self.slotHeaderPool:Acquire() --[[@as MPLM_SlotHeader]]
+            slotHeader.Label:SetText(name)
+            slotHeader:SetWidth(69)
+            slotHeader:SetPoint("TOPLEFT", currentXOffset, -90)
+            slotHeader:SetPoint("BOTTOM", 0, 10)
             slotHeader:Show()
-            slotToXOffset[filter] = currentXOffset
-            currentXOffset = currentXOffset + slotHeader:GetWidth() + 5
+
+            slotToXOffset[filter] = currentXOffset + 5
+            currentXOffset = currentXOffset + slotHeader:GetWidth()
         end
     end
 
