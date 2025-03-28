@@ -27,12 +27,7 @@ end
 MPLM_MainFrameMixin = {}
 
 function MPLM_MainFrameMixin:OnLoad()
-    -- this is required for the SpellBookItemAutoCastTemplate to be available
-    PlayerSpellsFrame_LoadUI();
-
     self:SetPortraitToAsset([[Interface\EncounterJournal\UI-EJ-PortraitIcon]]);
-    self:SetupFilterDropdown()
-    self:SetupStatSearchDropdown()
 
     self:RegisterEvent("EJ_LOOT_DATA_RECIEVED")
 
@@ -48,6 +43,14 @@ function MPLM_MainFrameMixin:OnLoad()
 
     ---@type DungeonInfo[]
     self.dungeonInfos = {}
+end
+
+function MPLM_MainFrameMixin:Init()
+    -- this is required for the SpellBookItemAutoCastTemplate to be available
+    PlayerSpellsFrame_LoadUI();
+
+    self:SetupFilterDropdown()
+    self:SetupStatSearchDropdown()
 end
 
 function MPLM_MainFrameMixin:OnEvent(event, ...)

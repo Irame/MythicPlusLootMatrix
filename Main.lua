@@ -14,7 +14,7 @@ MPLM_MainFrame = MPLM_MainFrame
 function addon:OnInitialize()
     self:RegisterChatCommand("mplm", "ChatCommandHandler");
 
-
+    MPLM_MainFrame:Init()
 end
 
 function addon:ChatCommandHandler(args)

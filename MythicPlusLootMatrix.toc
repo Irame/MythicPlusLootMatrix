@@ -7,10 +7,9 @@
 # External code + initialization
 embeds.xml
 
-Utils.lua
-
 # Frames
 ItemButton.xml
 MainFrame.xml
 
+Utils.lua
 Main.lua
