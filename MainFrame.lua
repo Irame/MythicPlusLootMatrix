@@ -28,6 +28,7 @@ end
 
 ---@class MPLM_MainFrame : Frame
 ---@field Filter Frame
+---@field ResizeButton Button
 ---@field SetPortraitToAsset fun(self, texturePath: string)
 ---@field Stat1Search any
 ---@field Stat2Search any
@@ -37,6 +38,8 @@ function MPLM_MainFrameMixin:OnLoad()
     self:SetPortraitToAsset([[Interface\EncounterJournal\UI-EJ-PortraitIcon]]);
 
     self:RegisterEvent("EJ_LOOT_DATA_RECIEVED")
+
+    self.ResizeButton:Init(self, 1100, 670);
 
     self.dungeonHeaderPool = CreateFramePool("Frame", self, "MPLM_DungeonHeaderTemplate")
     self.slotHeaderPool = CreateFramePool("Frame", self, "MPLM_SlotHeaderTemplate")
@@ -76,9 +79,14 @@ function MPLM_MainFrameMixin:OnEvent(event, ...)
     end
 end
 
+function MPLM_MainFrameMixin:OnSizeChanged()
+    self:LayoutMatrix(self.matrixFrames)
+end
+
 function MPLM_MainFrameMixin:DoScan()
     self.dungeonInfos = self:ScanDungeons()
-    self:BuildMatrix()
+    self.matrixFrames = self:BuildMatrix()
+    self:LayoutMatrix(self.matrixFrames)
     self:UpdateSearchGlow()
 end
 
@@ -198,16 +206,82 @@ function MPLM_MainFrameMixin:GetLootSlotsPresent()
 	return isLootSlotPresent;
 end
 
+---@class MatrixFrames
+---@field dungeonHeaders MPLM_DungeonHeader[]
+---@field slotHeaders MPLM_SlotHeader[]
+---@field itemButtons table<MPLM_DungeonHeader, table<MPLM_SlotHeader, MPLM_ItemButton[]>>
+
 function MPLM_MainFrameMixin:BuildMatrix()
     self.dungeonHeaderPool:ReleaseAll()
     self.slotHeaderPool:ReleaseAll()
     self.itemButtonPool:ReleaseAll()
 
+    ---@type MatrixFrames
+    local matrixFrames = {
+        dungeonHeaders = {},
+        slotHeaders = {},
+        itemButtons = {},
+    }
+
     local dungeonToHeader = {}
-    local lastDungeonHeader = nil
     for i, dungeonInfo in ipairs(self.dungeonInfos) do
         local dungeonHeader = self.dungeonHeaderPool:Acquire() --[[@as MPLM_DungeonHeader]]
-        dungeonHeader:SetHeight(69)
+        dungeonHeader:Init(dungeonInfo)
+
+        dungeonToHeader[dungeonInfo.id] = dungeonHeader
+        tinsert(matrixFrames.dungeonHeaders, dungeonHeader)
+    end
+
+	local isLootSlotPresent = self:GetLootSlotsPresent();
+
+
+    local slotToHeader = {}
+    for filter, name in pairs(SlotFilterToSlotName) do
+        if isLootSlotPresent[filter] then
+            local slotHeader = self.slotHeaderPool:Acquire() --[[@as MPLM_SlotHeader]]
+            slotHeader.Label:SetText(name)
+
+            slotToHeader[filter] = slotHeader
+            tinsert(matrixFrames.slotHeaders, slotHeader)
+        end
+    end
+
+    for i, dungeonInfo in ipairs(self.dungeonInfos) do
+        local dungeonHeader = dungeonToHeader[dungeonInfo.id]
+
+        local itemButtonsPerSlot = {}
+        for j, itemId in ipairs(dungeonInfo.loot) do
+            local itemInfo = self.itemCache[itemId]
+
+            if itemInfo then
+                local slotHeader = slotToHeader[itemInfo.filterType]
+                local currentButtons = itemButtonsPerSlot[slotHeader]
+                if not currentButtons then
+                    currentButtons = {}
+                    itemButtonsPerSlot[slotHeader] = currentButtons
+                end
+
+                local itemButton = self.itemButtonPool:Acquire() --[[@as MPLM_ItemButton]]
+                itemButton:Init(itemInfo)
+
+                tinsert(currentButtons, itemButton)
+            end
+        end
+
+        matrixFrames.itemButtons[dungeonHeader] = itemButtonsPerSlot
+    end
+
+    return matrixFrames
+end
+
+---@param matrixData MatrixFrames
+function MPLM_MainFrameMixin:LayoutMatrix(matrixData)
+    local availableHeight = self:GetHeight() - 95 - 10;
+    local dungenHeight = availableHeight / #matrixData.dungeonHeaders
+
+    local lastDungeonHeader = nil
+    for i, dungeonHeader in ipairs(matrixData.dungeonHeaders) do
+        dungeonHeader:SetHeight(dungenHeight)
         if lastDungeonHeader then
             dungeonHeader:SetPoint("TOPLEFT", lastDungeonHeader, "BOTTOMLEFT", 0, 0)
         else
@@ -215,59 +289,44 @@ function MPLM_MainFrameMixin:BuildMatrix()
         end
 
         dungeonHeader:SetPoint("RIGHT", -10, 0)
-        dungeonHeader:Init(dungeonInfo)
         dungeonHeader:Show()
 
-        dungeonToHeader[dungeonInfo.id] = dungeonHeader
         lastDungeonHeader = dungeonHeader
     end
 
-	local isLootSlotPresent = self:GetLootSlotsPresent();
-    local slotToHeader = {}
-    local lastSlotHeader = nil
-    for filter, name in pairs(SlotFilterToSlotName) do
-        if isLootSlotPresent[filter] then
-            local slotHeader = self.slotHeaderPool:Acquire() --[[@as MPLM_SlotHeader]]
-            slotHeader.Label:SetText(name)
-            slotHeader:SetWidth(69)
-            if lastSlotHeader then
-                slotHeader:SetPoint("TOPLEFT", lastSlotHeader, "TOPRIGHT", 0, 0)
-            else
-                slotHeader:SetPoint("TOPLEFT", 75, -90)
-            end
-            slotHeader:SetPoint("BOTTOM", 0, 10)
-            slotHeader:Show()
+    local slotStartX = (dungenHeight-5) + 10;
+    local availableWidth = self:GetWidth() - slotStartX - 10;
+    local slotWidth = availableWidth / #matrixData.slotHeaders
 
-            slotToHeader[filter] = slotHeader
-            lastSlotHeader = slotHeader
+    local lastSlotHeader = nil
+    for i, slotHeader in ipairs(matrixData.slotHeaders) do
+        slotHeader:SetWidth(slotWidth)
+        if lastSlotHeader then
+            slotHeader:SetPoint("TOPLEFT", lastSlotHeader, "TOPRIGHT", 0, 0)
+        else
+            slotHeader:SetPoint("TOPLEFT", slotStartX, -90)
         end
+        slotHeader:SetPoint("BOTTOM", 0, 10)
+        slotHeader:Show()
+
+        lastSlotHeader = slotHeader
     end
 
-    local itemButtons = {}
-    for i, dungeonInfo in ipairs(self.dungeonInfos) do
-        local dungeonHeader = dungeonToHeader[dungeonInfo.id]
+    local itemSpaceWidth = slotWidth - 5;
+    local itemSpaceHeight = dungenHeight - 5;
+    local minDimSize = math.min(itemSpaceWidth, itemSpaceHeight)
+    local itemIconSize = minDimSize/2
 
-        for j, itemId in ipairs(dungeonInfo.loot) do
-            local itemInfo = self.itemCache[itemId]
+    for dungeonHeader, itemButtonsPerDungeon in pairs(matrixData.itemButtons) do
+        for slotHeader, itemButtonsPerCell in pairs(itemButtonsPerDungeon) do
+            for k, itemButton in ipairs(itemButtonsPerCell) do
+                itemButton:SetSize(itemIconSize, itemIconSize)
 
-            if itemInfo then
-                local matrixKey = tostring(i)..','..tostring(itemInfo.filterType);
-                local currentButtons = itemButtons[matrixKey]
-                if not currentButtons then
-                    currentButtons = {}
-                    itemButtons[matrixKey] = currentButtons
-                end
-
-                local itemButton = self.itemButtonPool:Acquire() --[[@as MPLM_ItemButton]]
-                itemButton:Init(itemInfo)
-
-                local xOffset = ((#currentButtons)%2 * 32) + 5
-                local yOffset = -(math.floor((#currentButtons)/2) * 32) - 5
-                itemButton:SetPoint("LEFT", slotToHeader[itemInfo.filterType], "LEFT", xOffset, 0)
+                local xOffset = ((k-1)%2 * itemIconSize) + (itemSpaceWidth-minDimSize)/2 + 5
+                local yOffset = -(math.floor((k-1)/2) * itemIconSize) - (itemSpaceHeight-minDimSize)/2 - 5
+                itemButton:SetPoint("LEFT", slotHeader, "LEFT", xOffset, 0)
                 itemButton:SetPoint("TOP", dungeonHeader, "TOP", 0, yOffset)
                 itemButton:Show()
-
-                tinsert(currentButtons, itemButton)
             end
         end
     end

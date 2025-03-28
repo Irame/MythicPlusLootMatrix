@@ -53,7 +53,7 @@
 
     <Frame name="MPLM_MainFrame" parent="UIParent" inherits="PortraitFrameFlatTemplate"
         mixin="MPLM_MainFrameMixin" enableMouse="true" movable="true" clampedToScreen="true"
-        hidden="true">
+        hidden="true" resizable="true">
         <Size x="1100" y="670" />
         <Anchors>
             <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent" />
@@ -85,6 +85,11 @@
                     </OnClick>
                 </Scripts>
             </Button>
+			<Button parentKey="ResizeButton" inherits="PanelResizeButtonTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" x="-4" y="4"/>
+				</Anchors>
+			</Button>
         </Frames>
         <Layers>
             <Layer level="OVERLAY">
@@ -104,6 +109,7 @@
                 self:StopMovingOrSizing()
             </OnMouseUp>
             <OnEvent method="OnEvent"/>
+            <OnSizeChanged method="OnSizeChanged"/>
         </Scripts>
     </Frame>
 </Ui>
