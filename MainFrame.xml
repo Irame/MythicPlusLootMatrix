@@ -61,7 +61,7 @@
         <Frames>
             <DropdownButton parentKey="Stat1Search" inherits="WowStyle1DropdownTemplate">
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="130" y="-30"/>
+                    <Anchor point="TOPLEFT" x="130" y="-35"/>
                 </Anchors>
             </DropdownButton>
             <DropdownButton parentKey="Stat2Search" inherits="WowStyle1DropdownTemplate">
@@ -71,20 +71,9 @@
             </DropdownButton>
             <DropdownButton parentKey="Filter" inherits="WowStyle1DropdownTemplate">
                 <Anchors>
-                    <Anchor point="TOPRIGHT" x="-24" y="-30" />
+                    <Anchor point="TOPRIGHT" x="-24" y="-35" />
                 </Anchors>
             </DropdownButton>
-            <Button text="Scan" parentKey="ScanButton" inherits="UIPanelButtonTemplate">
-                <Size x="80" y="22"/>
-                <Anchors>
-                    <Anchor point="RIGHT" relativePoint="LEFT" x="-10" relativeKey="$parent.Filter"/>
-                </Anchors>
-                <Scripts>
-                    <OnClick>
-                        self:GetParent():DoScan()
-                    </OnClick>
-                </Scripts>
-            </Button>
 			<Button parentKey="ResizeButton" inherits="PanelResizeButtonTemplate">
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" x="-4" y="4"/>
@@ -102,6 +91,7 @@
         </Layers>
         <Scripts>
             <OnLoad method="OnLoad"/>
+            <OnShow method="OnShow"/>
             <OnMouseDown>
                 self:StartMoving()
             </OnMouseDown>

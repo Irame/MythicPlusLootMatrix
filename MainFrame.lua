@@ -60,6 +60,10 @@ function MPLM_MainFrameMixin:Init()
     self:SetupStatSearchDropdown()
 end
 
+function MPLM_MainFrameMixin:OnShow()
+    self:DoScan()
+end
+
 function MPLM_MainFrameMixin:OnEvent(event, ...)
     if event == "EJ_LOOT_DATA_RECIEVED" then
         if not self.RescanTimer then
