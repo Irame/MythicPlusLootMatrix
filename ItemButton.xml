@@ -1,5 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Script file="ItemButton.lua" />
+    <Font name="MPLM_ItemStatFont" inherits="SystemFont_Outline_Small" virtual="true" outline="NORMAL">
+        <Color r="0.1" g="1.0" b="0.1"/>
+    </Font>
     <Button name="MPLM_ItemButtonTemplate" mixin="MPLM_ItemButtonMixin" virtual="true">
         <Size x="32" y="32"/>
         <Layers>
@@ -17,6 +20,18 @@
                         <Anchor point="RIGHT" relativeKey="$parent.Icon" relativePoint="CENTER" x="20" y="1"/>
                     </Anchors>
                 </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString parentKey="Stat1" inherits="MPLM_ItemStatFont" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="BOTTOM" y="2"/>
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="Stat2" inherits="MPLM_ItemStatFont" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="BOTTOM" relativeKey="$parent.Stat1" relativePoint="TOP" y="2"/>
+                    </Anchors>
+                </FontString>
             </Layer>
         </Layers>
         <Scripts>

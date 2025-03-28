@@ -212,7 +212,7 @@ function MPLM_MainFrameMixin:ScanDungeons()
 
         EJ_SetDifficulty(DifficultyUtil.ID.DungeonChallenge)
 
-        private.addon:Print("Scanning instance: " .. instanceName)
+        --private.addon:Print("Scanning instance: " .. instanceName)
 
         local itemIds = {}
         for i = 1, EJ_GetNumLoot() do

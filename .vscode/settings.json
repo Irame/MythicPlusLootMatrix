@@ -55,6 +55,9 @@
         "CreateTexturePool",
         "CreateFramePool",
         "CreateFontStringPool",
-        "DifficultyUtil"
+        "DifficultyUtil",
+        "ITEM_MOD_CRIT_RATING_SHORT",
+        "ITEM_MOD_MASTERY_RATING_SHORT",
+        "ITEM_MOD_VERSATILITY"
     ]
 }
