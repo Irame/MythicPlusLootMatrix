@@ -9,8 +9,8 @@
 embeds.xml
 
 # Frames
-ItemButton.xml
-MainFrame.xml
+Frames/ItemButton.xml
+Frames/MainFrame.xml
 
 Utils.lua
 Main.lua
