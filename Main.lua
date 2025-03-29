@@ -16,7 +16,9 @@ function addon:OnInitialize()
 
     local dbDefaults = {
         char = {
-            slotActive = {}
+            slotActive = {},
+            stat1SearchValue = nil,
+            stat2SearchValue = nil,
         }
     }
 

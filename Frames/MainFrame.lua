@@ -156,11 +156,11 @@ function MPLM_MainFrameMixin:SetupStatSearchDropdown()
 
     do
         local function IsSelected(value)
-            return self.stat1SearchValue == value
+            return private.db.char.stat1SearchValue == value
         end
 
         local function SetSelected(value)
-            self.stat1SearchValue = value
+            private.db.char.stat1SearchValue = value
             UpdateOnSelection()
         end
 
@@ -175,11 +175,11 @@ function MPLM_MainFrameMixin:SetupStatSearchDropdown()
 
     do
         local function IsSelected(value)
-            return self.stat2SearchValue == value
+            return private.db.char.stat2SearchValue == value
         end
 
         local function SetSelected(value)
-            self.stat2SearchValue = value
+            private.db.char.stat2SearchValue = value
             UpdateOnSelection()
         end
 
@@ -237,12 +237,12 @@ end
 function MPLM_MainFrameMixin:MatchWithStatSearch(itemLink)
     if not itemLink then return nil end
 
-    if not self.stat1SearchValue or not self.stat2SearchValue then
+    if not private.db.char.stat1SearchValue or not private.db.char.stat2SearchValue then
         return true
     end
 
     local stats = C_Item.GetItemStats(itemLink)
-    local result = (stats[self.stat1SearchValue] and 1 or 0) + (stats[self.stat2SearchValue] and 1 or 0)
+    local result = (stats[private.db.char.stat1SearchValue] and 1 or 0) + (stats[private.db.char.stat2SearchValue] and 1 or 0)
     return result > 0 and result or false
 end
 
