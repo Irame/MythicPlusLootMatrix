@@ -333,6 +333,8 @@ function MPLM_MainFrameMixin:ScanDungeons()
     EncounterJournal_LoadUI()
 
     --Select Dungeons Tab
+    EncounterJournal.instanceID = nil
+    EncounterJournal.encounterID = nil
     EJ_ContentTab_Select(EncounterJournal.dungeonsTab:GetID())
 
     --Select Current Season
