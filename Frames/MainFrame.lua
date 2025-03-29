@@ -60,6 +60,7 @@ end
 ---@field Stat1Search any
 ---@field Stat2Search any
 ---@field SlotSelect any
+---@field HideOtherItems any
 MPLM_MainFrameMixin = {}
 
 function MPLM_MainFrameMixin:OnLoad()
@@ -87,6 +88,7 @@ function MPLM_MainFrameMixin:Init()
     self:SetupFilterDropdown()
     self:SetupStatSearchDropdown()
     self:SetupSlotsDropdown()
+    self:SetupHideOtherItemsCheckbox()
 end
 
 function MPLM_MainFrameMixin:OnShow()
@@ -144,6 +146,14 @@ function MPLM_MainFrameMixin:SetupFilterDropdown()
 end
 
 function MPLM_MainFrameMixin:SetupStatSearchDropdown()
+    local function UpdateOnSelection()
+        if self.hideOtherItems then
+            self:UpdateMatrix()
+        else
+            self:UpdateSearchGlow()
+        end
+    end
+
     do
         local function IsSelected(value)
             return self.stat1SearchValue == value
@@ -151,11 +161,11 @@ function MPLM_MainFrameMixin:SetupStatSearchDropdown()
 
         local function SetSelected(value)
             self.stat1SearchValue = value
-            self:UpdateSearchGlow()
+            UpdateOnSelection()
         end
 
         self.Stat1Search:SetupMenu(function(dropdown, rootDescription)
-            rootDescription:CreateRadio("None", IsSelected, SetSelected, nil);
+            rootDescription:CreateRadio("All Stats", IsSelected, SetSelected, nil);
 
             for key, shortName in pairs(private.statsShortened) do
                 rootDescription:CreateRadio(_G[key], IsSelected, SetSelected, key);
@@ -170,11 +180,11 @@ function MPLM_MainFrameMixin:SetupStatSearchDropdown()
 
         local function SetSelected(value)
             self.stat2SearchValue = value
-            self:UpdateSearchGlow()
+            UpdateOnSelection()
         end
 
         self.Stat2Search:SetupMenu(function(dropdown, rootDescription)
-            rootDescription:CreateRadio("None", IsSelected, SetSelected, nil);
+            rootDescription:CreateRadio("All Stats", IsSelected, SetSelected, nil);
 
             for key, shortName in pairs(private.statsShortened) do
                 rootDescription:CreateRadio(_G[key], IsSelected, SetSelected, key);
@@ -214,21 +224,39 @@ function MPLM_MainFrameMixin:SetupSlotsDropdown()
     end);
 end
 
+function MPLM_MainFrameMixin:SetupHideOtherItemsCheckbox()
+    local function HideOtherItemsToggled()
+        self.hideOtherItems = not self.hideOtherItems
+        self:UpdateMatrix()
+    end
+
+	self.HideOtherItems:SetControlChecked(self.hideOtherItems);
+	self.HideOtherItems:SetCallback(HideOtherItemsToggled);
+end
+
+function MPLM_MainFrameMixin:MatchWithStatSearch(itemLink)
+    if not itemLink then return nil end
+
+    if not self.stat1SearchValue or not self.stat2SearchValue then
+        return true
+    end
+
+    local stats = C_Item.GetItemStats(itemLink)
+    local result = (stats[self.stat1SearchValue] and 1 or 0) + (stats[self.stat2SearchValue] and 1 or 0)
+    return result > 0 and result or false
+end
+
 function MPLM_MainFrameMixin:UpdateSearchGlow()
     for button in self.itemButtonPool:EnumerateActive() --[[@as fun(): MPLM_ItemButton]] do
         if button.itemLink then
-            local stats = C_Item.GetItemStats(button.itemLink)
-            local stat1Value = stats[self.stat1SearchValue]
-            local stat2Value = stats[self.stat2SearchValue]
-            if stat1Value and stat2Value then
+            local matchResult = self:MatchWithStatSearch(button.itemLink)
+            if matchResult == 2 then
                 button:ShowStrongHighlight()
+            elseif matchResult == 1 then
+                button:ShowWeakHighlight()
             else
-                if stat1Value or stat2Value then
-                    button:ShowWeakHighlight()
-                else
-                    button:HideWeakHighlight()
-                    button:HideStrongHighlight()
-                end
+                button:HideWeakHighlight()
+                button:HideStrongHighlight()
             end
         else
             button:HideStrongHighlight()
@@ -250,11 +278,19 @@ function MPLM_MainFrameMixin:GetLootSlotsPresent()
 	return isLootSlotPresent;
 end
 
+function MPLM_MainFrameMixin:IsItemVisible(itemInfo)
+    return itemInfo
+        and itemInfo.filterType
+        and itemInfo.link
+        and private.db.char.slotActive[itemInfo.filterType]
+        and (not self.hideOtherItems or self:MatchWithStatSearch(itemInfo.link))
+        and true or false
+end
+
 ---@param dungeonInfo DungeonInfo
 function MPLM_MainFrameMixin:HasDungeonVisibleItems(dungeonInfo)
     for i, itemId in ipairs(dungeonInfo.loot) do
-        local itemInfo = self.itemCache[itemId]
-        if itemInfo and private.db.char.slotActive[itemInfo.filterType] then
+        if self:IsItemVisible(self.itemCache[itemId]) then
             return true
         end
     end
@@ -308,7 +344,7 @@ function MPLM_MainFrameMixin:BuildMatrix()
             for j, itemId in ipairs(dungeonInfo.loot) do
                 local itemInfo = self.itemCache[itemId]
 
-                if itemInfo and private.db.char.slotActive[itemInfo.filterType] then
+                if self:IsItemVisible(itemInfo) then
                     local slotHeader = slotToHeader[itemInfo.filterType]
                     local currentButtons = itemButtonsPerSlot[slotHeader]
                     if not currentButtons then

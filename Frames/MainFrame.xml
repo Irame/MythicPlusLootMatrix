@@ -116,6 +116,16 @@
                     <Anchor point="LEFT" relativeKey="$parent.Stat1Search" relativePoint="RIGHT" x="10"/>
                 </Anchors>
             </DropdownButton>
+            <Frame parentKey="HideOtherItems" inherits="ResizeCheckButtonTemplate">
+                <KeyValues>
+                    <KeyValue key="labelText" value="Hide Others" type="string"/>
+                    <KeyValue key="labelFont" value="GameFontNormalMed2" type="string"/>
+                    <KeyValue key="disabledLabelFont" value="GameFontDisableMed2" type="string"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.Stat2Search" relativePoint="RIGHT" x="10"/>
+                </Anchors>
+            </Frame>
             <DropdownButton parentKey="SlotSelect" inherits="WowStyle1DropdownTemplate">
                 <Anchors>
                     <Anchor point="LEFT" relativeKey="$parent.Stat2Search" relativePoint="RIGHT" x="200"/>
@@ -126,11 +136,11 @@
                     <Anchor point="TOPRIGHT" x="-24" y="-35" />
                 </Anchors>
             </DropdownButton>
-			<Button parentKey="ResizeButton" inherits="PanelResizeButtonTemplate">
-				<Anchors>
-					<Anchor point="BOTTOMRIGHT" x="-4" y="4"/>
-				</Anchors>
-			</Button>
+            <Button parentKey="ResizeButton" inherits="PanelResizeButtonTemplate">
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" x="-4" y="4"/>
+                </Anchors>
+            </Button>
         </Frames>
         <Layers>
             <Layer level="OVERLAY">
