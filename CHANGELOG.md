@@ -1,1 +1,3 @@
-Inital release see README for details.
+- Now has more modern Item Borders
+- Now shows the currently equipped items at the top
+- Added highlighting when mouseover a row or column
