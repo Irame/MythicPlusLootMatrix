@@ -250,6 +250,16 @@ function MPLM_MainFrameMixin:GetLootSlotsPresent()
 	return isLootSlotPresent;
 end
 
+---@param dungeonInfo DungeonInfo
+function MPLM_MainFrameMixin:HasDungeonVisibleItems(dungeonInfo)
+    for i, itemId in ipairs(dungeonInfo.loot) do
+        local itemInfo = self.itemCache[itemId]
+        if itemInfo and private.db.char.slotActive[itemInfo.filterType] then
+            return true
+        end
+    end
+end
+
 ---@class MatrixFrames
 ---@field dungeonHeaders MPLM_DungeonHeader[]
 ---@field slotHeaders MPLM_SlotHeader[]
@@ -269,11 +279,13 @@ function MPLM_MainFrameMixin:BuildMatrix()
 
     local dungeonToHeader = {}
     for i, dungeonInfo in ipairs(self.dungeonInfos) do
-        local dungeonHeader = self.dungeonHeaderPool:Acquire() --[[@as MPLM_DungeonHeader]]
-        dungeonHeader:Init(dungeonInfo)
+        if self:HasDungeonVisibleItems(dungeonInfo) then
+            local dungeonHeader = self.dungeonHeaderPool:Acquire() --[[@as MPLM_DungeonHeader]]
+            dungeonHeader:Init(dungeonInfo)
 
-        dungeonToHeader[dungeonInfo.id] = dungeonHeader
-        tinsert(matrixFrames.dungeonHeaders, dungeonHeader)
+            dungeonToHeader[dungeonInfo.id] = dungeonHeader
+            tinsert(matrixFrames.dungeonHeaders, dungeonHeader)
+        end
     end
 
 	local isLootSlotPresent = self:GetLootSlotsPresent();
@@ -291,26 +303,28 @@ function MPLM_MainFrameMixin:BuildMatrix()
     for i, dungeonInfo in ipairs(self.dungeonInfos) do
         local dungeonHeader = dungeonToHeader[dungeonInfo.id]
 
-        local itemButtonsPerSlot = {}
-        for j, itemId in ipairs(dungeonInfo.loot) do
-            local itemInfo = self.itemCache[itemId]
+        if dungeonHeader then
+            local itemButtonsPerSlot = {}
+            for j, itemId in ipairs(dungeonInfo.loot) do
+                local itemInfo = self.itemCache[itemId]
 
-            if itemInfo and private.db.char.slotActive[itemInfo.filterType] then
-                local slotHeader = slotToHeader[itemInfo.filterType]
-                local currentButtons = itemButtonsPerSlot[slotHeader]
-                if not currentButtons then
-                    currentButtons = {}
-                    itemButtonsPerSlot[slotHeader] = currentButtons
+                if itemInfo and private.db.char.slotActive[itemInfo.filterType] then
+                    local slotHeader = slotToHeader[itemInfo.filterType]
+                    local currentButtons = itemButtonsPerSlot[slotHeader]
+                    if not currentButtons then
+                        currentButtons = {}
+                        itemButtonsPerSlot[slotHeader] = currentButtons
+                    end
+
+                    local itemButton = self.itemButtonPool:Acquire() --[[@as MPLM_ItemButton]]
+                    itemButton:Init(itemInfo)
+
+                    tinsert(currentButtons, itemButton)
                 end
-
-                local itemButton = self.itemButtonPool:Acquire() --[[@as MPLM_ItemButton]]
-                itemButton:Init(itemInfo)
-
-                tinsert(currentButtons, itemButton)
             end
-        end
 
-        matrixFrames.itemButtons[dungeonHeader] = itemButtonsPerSlot
+            matrixFrames.itemButtons[dungeonHeader] = itemButtonsPerSlot
+        end
     end
 
     return matrixFrames
