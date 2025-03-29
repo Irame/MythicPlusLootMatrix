@@ -272,7 +272,12 @@ end
 
 ---@param matrixData MatrixFrames
 function MPLM_MainFrameMixin:LayoutMatrix(matrixData)
-    local availableHeight = self:GetHeight() - 95 - 10;
+    local padding = 10
+    local dividerSize = 5
+    local topAreaHeight = 90
+    local dungeonStartY = topAreaHeight + 5
+
+    local availableHeight = self:GetHeight() - dungeonStartY - padding;
     local dungenHeight = availableHeight / #matrixData.dungeonHeaders
 
     local lastDungeonHeader = nil
@@ -281,17 +286,17 @@ function MPLM_MainFrameMixin:LayoutMatrix(matrixData)
         if lastDungeonHeader then
             dungeonHeader:SetPoint("TOPLEFT", lastDungeonHeader, "BOTTOMLEFT", 0, 0)
         else
-            dungeonHeader:SetPoint("TOPLEFT", 10, -95)
+            dungeonHeader:SetPoint("TOPLEFT", padding, -dungeonStartY)
         end
 
-        dungeonHeader:SetPoint("RIGHT", -10, 0)
+        dungeonHeader:SetPoint("RIGHT", -padding, 0)
         dungeonHeader:Show()
 
         lastDungeonHeader = dungeonHeader
     end
 
-    local slotStartX = (dungenHeight-5) + 10;
-    local availableWidth = self:GetWidth() - slotStartX - 10;
+    local slotStartX = (dungenHeight - dividerSize) + padding;
+    local availableWidth = self:GetWidth() - slotStartX - padding;
     local slotWidth = availableWidth / #matrixData.slotHeaders
 
     local lastSlotHeader = nil
@@ -300,16 +305,16 @@ function MPLM_MainFrameMixin:LayoutMatrix(matrixData)
         if lastSlotHeader then
             slotHeader:SetPoint("TOPLEFT", lastSlotHeader, "TOPRIGHT", 0, 0)
         else
-            slotHeader:SetPoint("TOPLEFT", slotStartX, -90)
+            slotHeader:SetPoint("TOPLEFT", slotStartX, -topAreaHeight)
         end
-        slotHeader:SetPoint("BOTTOM", 0, 10)
+        slotHeader:SetPoint("BOTTOM", 0, padding)
         slotHeader:Show()
 
         lastSlotHeader = slotHeader
     end
 
-    local itemSpaceWidth = slotWidth - 5;
-    local itemSpaceHeight = dungenHeight - 5;
+    local itemSpaceWidth = slotWidth - dividerSize;
+    local itemSpaceHeight = dungenHeight - dividerSize;
     local minDimSize = math.min(itemSpaceWidth, itemSpaceHeight)
     local itemIconSize = minDimSize/2
 
@@ -318,8 +323,8 @@ function MPLM_MainFrameMixin:LayoutMatrix(matrixData)
             for k, itemButton in ipairs(itemButtonsPerCell) do
                 itemButton:SetSize(itemIconSize, itemIconSize)
 
-                local xOffset = ((k-1)%2 * itemIconSize) + (itemSpaceWidth-minDimSize)/2 + 5
-                local yOffset = -(math.floor((k-1)/2) * itemIconSize) - (itemSpaceHeight-minDimSize)/2 - 5
+                local xOffset = ((k-1)%2 * itemIconSize) + (itemSpaceWidth-minDimSize)/2 + dividerSize
+                local yOffset = -(math.floor((k-1)/2) * itemIconSize) - (itemSpaceHeight-minDimSize)/2 - dividerSize
                 itemButton:SetPoint("LEFT", slotHeader, "LEFT", xOffset, 0)
                 itemButton:SetPoint("TOP", dungeonHeader, "TOP", 0, yOffset)
                 itemButton:Show()
