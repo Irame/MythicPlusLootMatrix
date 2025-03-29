@@ -116,6 +116,11 @@
                     <Anchor point="LEFT" relativeKey="$parent.Stat1Search" relativePoint="RIGHT" x="10"/>
                 </Anchors>
             </DropdownButton>
+            <DropdownButton parentKey="SlotSelect" inherits="WowStyle1DropdownTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.Stat2Search" relativePoint="RIGHT" x="200"/>
+                </Anchors>
+            </DropdownButton>
             <DropdownButton parentKey="Filter" inherits="WowStyle1DropdownTemplate">
                 <Anchors>
                     <Anchor point="TOPRIGHT" x="-24" y="-35" />
@@ -132,6 +137,13 @@
                 <FontString text="Search" inherits="GameFontNormal">
                     <Anchors>
                         <Anchor point="RIGHT" relativeKey="$parent.Stat1Search" relativePoint="LEFT" x="-10"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString text="Slots" inherits="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeKey="$parent.SlotSelect" relativePoint="LEFT" x="-10"/>
                     </Anchors>
                 </FontString>
             </Layer>

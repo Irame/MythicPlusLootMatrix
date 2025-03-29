@@ -59,6 +59,7 @@ end
 ---@field SetPortraitToAsset fun(self, texturePath: string)
 ---@field Stat1Search any
 ---@field Stat2Search any
+---@field SlotSelect any
 MPLM_MainFrameMixin = {}
 
 function MPLM_MainFrameMixin:OnLoad()
@@ -77,6 +78,9 @@ function MPLM_MainFrameMixin:OnLoad()
 
     ---@type DungeonInfo[]
     self.dungeonInfos = {}
+
+    ---@type table<Enum.ItemSlotFilterType, boolean>
+    self.slotActive = {}
 end
 
 function MPLM_MainFrameMixin:Init()
@@ -85,6 +89,7 @@ function MPLM_MainFrameMixin:Init()
 
     self:SetupFilterDropdown()
     self:SetupStatSearchDropdown()
+    self:SetupSlotsDropdown()
 end
 
 function MPLM_MainFrameMixin:OnShow()
@@ -177,6 +182,43 @@ function MPLM_MainFrameMixin:SetupStatSearchDropdown()
     end
 end
 
+function MPLM_MainFrameMixin:SetupSlotsDropdown()
+    for filter, name in pairs(private.slotFilterToSlotName) do
+        if filter ~= Enum.ItemSlotFilterType.Other then
+            self.slotActive[filter] = true
+        end
+    end
+
+    local function IsSelected(value)
+        return self.slotActive[value]
+    end
+
+    local function SetSelected(value)
+        self.slotActive[value] = not self.slotActive[value]
+        self:DoScan()
+    end
+
+    local function SetAllSelect(value)
+        for index in pairs(self.slotActive) do
+            self.slotActive[index] = value
+        end
+        self:DoScan()
+    end
+
+    self.SlotSelect:SetupMenu(function(dropdown, rootDescription)
+        rootDescription:CreateButton("Select All", SetAllSelect, true)
+        rootDescription:CreateButton("Unselect All", SetAllSelect, false)
+
+        rootDescription:CreateDivider()
+
+        for filter, name in pairs(private.slotFilterToSlotName) do
+            if filter ~= Enum.ItemSlotFilterType.Other then
+                rootDescription:CreateCheckbox(name, IsSelected, SetSelected, filter);
+            end
+        end
+    end);
+end
+
 function MPLM_MainFrameMixin:UpdateSearchGlow()
     for button in self.itemButtonPool:EnumerateActive() --[[@as fun(): MPLM_ItemButton]] do
         if button.itemLink then
@@ -242,7 +284,7 @@ function MPLM_MainFrameMixin:BuildMatrix()
 	local isLootSlotPresent = self:GetLootSlotsPresent();
     local slotToHeader = {}
     for filter, name in pairs(private.slotFilterToSlotName) do
-        if isLootSlotPresent[filter] then
+        if isLootSlotPresent[filter] and self.slotActive[filter] then
             local slotHeader = self.slotHeaderPool:Acquire() --[[@as MPLM_SlotHeader]]
             slotHeader:Init(filter)
 
@@ -258,7 +300,7 @@ function MPLM_MainFrameMixin:BuildMatrix()
         for j, itemId in ipairs(dungeonInfo.loot) do
             local itemInfo = self.itemCache[itemId]
 
-            if itemInfo then
+            if itemInfo and self.slotActive[itemInfo.filterType] then
                 local slotHeader = slotToHeader[itemInfo.filterType]
                 local currentButtons = itemButtonsPerSlot[slotHeader]
                 if not currentButtons then
