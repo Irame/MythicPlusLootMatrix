@@ -24,9 +24,25 @@
                     </Anchors>
                 </Texture>
             </Layer>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="HighlightBackground" hidden="true">
+                    <Color r="1" g="1" b="1" a="0.08"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" y="-2.5"/>
+                        <Anchor point="BOTTOMRIGHT" y="-2.5"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
         </Layers>
         <Scripts>
             <OnSizeChanged method="OnSizeChanged"/>
+            <OnUpdate>
+                if self:IsMouseOver() then
+                    self.HighlightBackground:Show()
+                else
+                    self.HighlightBackground:Hide()
+                end
+            </OnUpdate>
         </Scripts>
     </Frame>
 
@@ -48,7 +64,26 @@
                     </Anchors>
                 </Texture>
             </Layer>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="HighlightBackground" hidden="true">
+                    <Color r="1" g="1" b="1" a="0.08"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativeKey="$parent.Label" y="2"/>
+                        <Anchor point="LEFT" x="2.5"/>
+                        <Anchor point="BOTTOMRIGHT" x="2.5"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
         </Layers>
+        <Scripts>
+            <OnUpdate>
+                if self:IsMouseOver() then
+                    self.HighlightBackground:Show()
+                else
+                    self.HighlightBackground:Hide()
+                end
+            </OnUpdate>
+        </Scripts>
     </Frame>
 
     <Frame name="MPLM_MainFrame" parent="UIParent" inherits="PortraitFrameFlatTemplate"
