@@ -112,6 +112,10 @@ end
 
 function MPLM_MainFrameMixin:DoScan()
     self.dungeonInfos = self:ScanDungeons()
+    self:UpdateMatrix()
+end
+
+function MPLM_MainFrameMixin:UpdateMatrix()
     self.matrixFrames = self:BuildMatrix()
     self:LayoutMatrix(self.matrixFrames)
     self:UpdateSearchGlow()
@@ -186,14 +190,14 @@ function MPLM_MainFrameMixin:SetupSlotsDropdown()
 
     local function SetSelected(value)
         private.db.char.slotActive[value] = not private.db.char.slotActive[value]
-        self:DoScan()
+        self:UpdateMatrix()
     end
 
     local function SetAllSelect(value)
         for index in pairs(private.db.char.slotActive) do
             private.db.char.slotActive[index] = value
         end
-        self:DoScan()
+        self:UpdateMatrix()
     end
 
     self.SlotSelect:SetupMenu(function(dropdown, rootDescription)
