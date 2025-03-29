@@ -46,7 +46,7 @@
         </Scripts>
     </Frame>
 
-    <Frame name="MPLM_SlotHeaderTemplate" virtual="true">
+    <Frame name="MPLM_SlotHeaderTemplate" mixin="MPLM_SlotHeaderMixin" virtual="true">
         <Layers>
             <Layer level="OVERLAY">
                 <FontString parentKey="Label" inherits="GameFontNormal">
@@ -75,6 +75,18 @@
                 </Texture>
             </Layer>
         </Layers>
+        <Frames>
+            <Button inherits="MPLM_ItemButtonTemplate" parentKey="EquippedItem1Button">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativePoint="TOP" y="-7"/>
+                </Anchors>
+            </Button>
+            <Button inherits="MPLM_ItemButtonTemplate" parentKey="EquippedItem2Button">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOP" y="-7"/>
+                </Anchors>
+            </Button>
+        </Frames>
         <Scripts>
             <OnUpdate>
                 if self:IsMouseOver() then

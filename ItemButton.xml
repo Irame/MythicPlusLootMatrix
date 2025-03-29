@@ -3,33 +3,37 @@
     <Font name="MPLM_ItemStatFont" inherits="SystemFont_Outline_Small" virtual="true" outline="NORMAL">
         <Color r="0.1" g="1.0" b="0.1"/>
     </Font>
+    <Font name="MPLM_ItemLevelFont" inherits="SystemFont_Outline" virtual="true" outline="NORMAL">
+        <Color r="0.1" g="1.0" b="0.1"/>
+    </Font>
     <Button name="MPLM_ItemButtonTemplate" mixin="MPLM_ItemButtonMixin" virtual="true">
         <Size x="32" y="32"/>
         <Layers>
             <Layer level="BACKGROUND">
-                <Texture parentKey="Icon">
-                    <Size x="28" y="28"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </Texture>
+                <Texture parentKey="Icon" setAllPoints="true"/>
             </Layer>
             <Layer level="BORDER">
-                <Texture parentKey="Border" atlas="loottab-set-itemborder-green" useAtlasSize="true">
+                <Texture parentKey="Border" file="Interface\Common\WhiteIconFrame">
                     <Anchors>
-                        <Anchor point="RIGHT" relativeKey="$parent.Icon" relativePoint="CENTER" x="20" y="1"/>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Icon"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Icon"/>
                     </Anchors>
                 </Texture>
             </Layer>
             <Layer level="OVERLAY">
+                <FontString parentKey="ItemLevel" inherits="MPLM_ItemLevelFont">
+                    <Anchors>
+                        <Anchor point="CENTER" relativePoint="TOP" y="-2"/>
+                    </Anchors>
+                </FontString>
                 <FontString parentKey="Stat1" inherits="MPLM_ItemStatFont" justifyH="LEFT">
                     <Anchors>
-                        <Anchor point="BOTTOM" y="2"/>
+                        <Anchor point="BOTTOM" y="3"/>
                     </Anchors>
                 </FontString>
                 <FontString parentKey="Stat2" inherits="MPLM_ItemStatFont" justifyH="LEFT">
                     <Anchors>
-                        <Anchor point="BOTTOM" relativeKey="$parent.Stat1" relativePoint="TOP" y="2"/>
+                        <Anchor point="BOTTOM" relativeKey="$parent.Stat1" relativePoint="TOP"/>
                     </Anchors>
                 </FontString>
             </Layer>

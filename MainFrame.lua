@@ -24,6 +24,33 @@ function MPLM_DungeonHeaderMixin:OnSizeChanged(width, height)
 end
 
 ---@class MPLM_SlotHeader : Frame
+---@field EquippedItem1Button MPLM_ItemButton
+---@field EquippedItem2Button MPLM_ItemButton
+MPLM_SlotHeaderMixin = {}
+
+function MPLM_SlotHeaderMixin:Init(slot)
+    self.Label:SetText(private.slotFilterToSlotName[slot])
+    local slotIDs = private.slotFilterToSlotIDs[slot]
+
+    if slotIDs[1] then
+        local itemLink = GetInventoryItemLink("player", slotIDs[1])
+        self.EquippedItem1Button:Init(itemLink)
+    else
+        self.EquippedItem1Button:Hide()
+    end
+
+    self.EquippedItem1Button:ClearAllPoints()
+    if slotIDs[2] then
+        local itemLink = GetInventoryItemLink("player", slotIDs[2])
+        self.EquippedItem2Button:Init(itemLink)
+        self.EquippedItem1Button:SetPoint("TOPRIGHT", self, "TOP", 0, -7)
+    else
+        self.EquippedItem2Button:Hide()
+        self.EquippedItem1Button:SetPoint("TOP", 0, -7)
+    end
+end
+
+---@class MPLM_SlotHeader : Frame
 ---@field Label FontString
 
 ---@class MPLM_MainFrame : Frame
@@ -152,8 +179,8 @@ end
 
 function MPLM_MainFrameMixin:UpdateSearchGlow()
     for button in self.itemButtonPool:EnumerateActive() --[[@as fun(): MPLM_ItemButton]] do
-        if button.itemInfo.link then
-            local stats = C_Item.GetItemStats(button.itemInfo.link)
+        if button.itemLink then
+            local stats = C_Item.GetItemStats(button.itemLink)
             local stat1Value = stats[self.stat1SearchValue]
             local stat2Value = stats[self.stat2SearchValue]
             if stat1Value and stat2Value then
@@ -172,24 +199,6 @@ function MPLM_MainFrameMixin:UpdateSearchGlow()
         end
     end
 end
-
-local SlotFilterToSlotName = {
-	[Enum.ItemSlotFilterType.Head] = INVTYPE_HEAD,
-	[Enum.ItemSlotFilterType.Neck] = INVTYPE_NECK,
-	[Enum.ItemSlotFilterType.Shoulder] = INVTYPE_SHOULDER,
-	[Enum.ItemSlotFilterType.Cloak] = INVTYPE_CLOAK,
-	[Enum.ItemSlotFilterType.Chest] = INVTYPE_CHEST,
-	[Enum.ItemSlotFilterType.Wrist] = INVTYPE_WRIST,
-	[Enum.ItemSlotFilterType.Hand] = INVTYPE_HAND,
-	[Enum.ItemSlotFilterType.Waist] = INVTYPE_WAIST,
-	[Enum.ItemSlotFilterType.Legs] = INVTYPE_LEGS,
-	[Enum.ItemSlotFilterType.Feet] = INVTYPE_FEET,
-	[Enum.ItemSlotFilterType.MainHand] = INVTYPE_WEAPONMAINHAND,
-	[Enum.ItemSlotFilterType.OffHand] = INVTYPE_WEAPONOFFHAND,
-	[Enum.ItemSlotFilterType.Finger] = INVTYPE_FINGER,
-	[Enum.ItemSlotFilterType.Trinket] = INVTYPE_TRINKET,
-	[Enum.ItemSlotFilterType.Other] = EJ_LOOT_SLOT_FILTER_OTHER,
-}
 
 function MPLM_MainFrameMixin:GetLootSlotsPresent()
 	local isLootSlotPresent = {};
@@ -232,10 +241,10 @@ function MPLM_MainFrameMixin:BuildMatrix()
 
 	local isLootSlotPresent = self:GetLootSlotsPresent();
     local slotToHeader = {}
-    for filter, name in pairs(SlotFilterToSlotName) do
+    for filter, name in pairs(private.slotFilterToSlotName) do
         if isLootSlotPresent[filter] then
             local slotHeader = self.slotHeaderPool:Acquire() --[[@as MPLM_SlotHeader]]
-            slotHeader.Label:SetText(name)
+            slotHeader:Init(filter)
 
             slotToHeader[filter] = slotHeader
             tinsert(matrixFrames.slotHeaders, slotHeader)
@@ -275,7 +284,7 @@ function MPLM_MainFrameMixin:LayoutMatrix(matrixData)
     local padding = 10
     local dividerSize = 5
     local topAreaHeight = 90
-    local dungeonStartY = topAreaHeight + 5
+    local dungeonStartY = topAreaHeight + 5 + 35
 
     local availableHeight = self:GetHeight() - dungeonStartY - padding;
     local dungenHeight = availableHeight / #matrixData.dungeonHeaders

@@ -2,27 +2,51 @@
 local private = select(2, ...)
 
 ---@class MPLM_ItemButton : Button
----@field itemInfo EncounterJournalItemInfo
+---@field itemLink string
 ---@field Icon Texture
 ---@field Border Texture
 ---@field Stat1 FontString
 ---@field Stat2 FontString
+---@field ItemLevel FontString
 ---@field AutoCastOverlay any
 ---@field SpellActivationAlert? Frame
 MPLM_ItemButtonMixin = {}
 
----@param itemInfo EncounterJournalItemInfo
-function MPLM_ItemButtonMixin:Init(itemInfo)
-    self.itemInfo = itemInfo
-    self.Icon:SetTexture(itemInfo.icon)
+---@param itemInfoOrLink? EncounterJournalItemInfo | string
+function MPLM_ItemButtonMixin:Init(itemInfoOrLink)
+    local function FinishInit()
+        self:UpdateStats()
+        self:UpdateBorder()
+        self:Show()
+    end
 
-    self:UpdateStats()
-    self:UpdateBorder()
-    self:CheckItemButtonTooltip();
+    local argType = type(itemInfoOrLink)
+    if argType == "table" then
+        self.itemLink = itemInfoOrLink.link
+        self.Icon:SetTexture(itemInfoOrLink.icon)
+        self.ItemLevel:Hide()
+
+        FinishInit()
+    elseif argType == "string" then
+        local item = Item:CreateFromItemLink(itemInfoOrLink)
+        item:ContinueOnItemLoad(function ()
+            self.itemLink = item:GetItemLink()
+            self.Icon:SetTexture(item:GetItemIcon())
+            self.ItemLevel:SetText(tostring(item:GetCurrentItemLevel()))
+            self.ItemLevel:SetTextColor(item:GetItemQualityColor().color:GetRGB())
+            self.ItemLevel:Show()
+
+            FinishInit()
+        end)
+    else
+        self.itemLink = nil
+        self:Hide()
+        return
+    end
 end
 
 function MPLM_ItemButtonMixin:Reset()
-    self.itemInfo = nil
+    self.itemLink = nil
     self:HideStrongHighlight()
     self:HideWeakHighlight()
     self:Hide()
@@ -56,8 +80,8 @@ function MPLM_ItemButtonMixin:HideWeakHighlight()
 end
 
 function MPLM_ItemButtonMixin:UpdateStats()
-    if self.itemInfo.link then
-        local stats = C_Item.GetItemStats(self.itemInfo.link)
+    if self.itemLink then
+        local stats = C_Item.GetItemStats(self.itemLink)
 
         local statInfo = {}
         for stat, value in pairs(stats) do
@@ -87,21 +111,15 @@ function MPLM_ItemButtonMixin:UpdateStats()
 end
 
 function MPLM_ItemButtonMixin:UpdateBorder()
-    local _, _, itemQuality = C_Item.GetItemInfo(self.itemInfo.link or self.itemInfo.itemID);
+    local _, _, itemQuality = C_Item.GetItemInfo(self.itemLink);
     itemQuality = itemQuality or Enum.ItemQuality.Epic;
-    if ( itemQuality == Enum.ItemQuality.Uncommon ) then
-        self.Border:SetAtlas("loottab-set-itemborder-green", true);
-    elseif ( itemQuality == Enum.ItemQuality.Rare ) then
-        self.Border:SetAtlas("loottab-set-itemborder-blue", true);
-    elseif ( itemQuality == Enum.ItemQuality.Epic ) then
-        self.Border:SetAtlas("loottab-set-itemborder-purple", true);
+    if IsArtifactRelicItem(self.itemLink) then
+        self.Border:SetTexture([[Interface\Artifacts\RelicIconFrame]]);
+    else
+        self.Border:SetTexture([[Interface\Common\WhiteIconFrame]]);
     end
-end
-
-function MPLM_ItemButtonMixin:CheckItemButtonTooltip()
-	if GameTooltip:GetOwner() == self and self.itemInfo.link and not self.tooltipHasLink then
-		self:ShowItemTooltip();
-	end
+    local color = BAG_ITEM_QUALITY_COLORS[itemQuality];
+    self.Border:SetVertexColor(color.r, color.g, color.b);
 end
 
 function MPLM_ItemButtonMixin:GetPreviewClassAndSpec()
@@ -128,16 +146,14 @@ function MPLM_ItemButtonMixin:OnUpdate()
 end
 
 function MPLM_ItemButtonMixin:ShowItemTooltip()
-    if not self.itemInfo then return end
+    if not self.itemLink then return end
 
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
     -- itemLink may not be available until after a GET_ITEM_INFO_RECEIVED event
-    if self.itemInfo.link then
+    if self.itemLink then
         local classID, specID = self:GetPreviewClassAndSpec();
-        GameTooltip:SetHyperlink(self.itemInfo.link, classID, specID);
+        GameTooltip:SetHyperlink(self.itemLink, classID, specID);
         self.tooltipHasLink = true
-    else
-        GameTooltip:SetItemByID(self.itemInfo.itemID);
     end
     GameTooltip_ShowCompareItem();
 end
@@ -154,14 +170,10 @@ function MPLM_ItemButtonMixin:OnLeave()
 end
 
 function MPLM_ItemButtonMixin:OnClick()
-    HandleModifiedItemClick(self.itemInfo and self.itemInfo.link);
+    HandleModifiedItemClick(self.itemLink);
 end
 
 function MPLM_ItemButtonMixin:OnSizeChanged(width, height)
-    local minDimSize = math.min(width, height)
-    self.Border:SetScale(minDimSize/32)
-    self.Icon:SetScale(minDimSize/32)
-
     if self.SpellActivationAlert then
         self.SpellActivationAlert:SetSize(width * 1.4, height * 1.4)
         self.SpellActivationAlert.ProcStartFlipbook:SetSize(width*3.5, height*3.5)
