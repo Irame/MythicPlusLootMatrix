@@ -372,9 +372,10 @@ function MPLM_MainFrameMixin:LayoutMatrix(matrixData)
     local dividerSize = 5
     local topAreaHeight = 90
     local dungeonStartY = topAreaHeight + 5 + 35
+    local maxCellSize = 110
 
     local availableHeight = self:GetHeight() - dungeonStartY - padding;
-    local dungenHeight = availableHeight / #matrixData.dungeonHeaders
+    local dungenHeight = math.min(maxCellSize, availableHeight / #matrixData.dungeonHeaders)
 
     local lastDungeonHeader = nil
     for i, dungeonHeader in ipairs(matrixData.dungeonHeaders) do
@@ -393,7 +394,7 @@ function MPLM_MainFrameMixin:LayoutMatrix(matrixData)
 
     local slotStartX = (dungenHeight - dividerSize) + padding;
     local availableWidth = self:GetWidth() - slotStartX - padding;
-    local slotWidth = availableWidth / #matrixData.slotHeaders
+    local slotWidth = math.min(maxCellSize, availableWidth / #matrixData.slotHeaders)
 
     local lastSlotHeader = nil
     for i, slotHeader in ipairs(matrixData.slotHeaders) do
