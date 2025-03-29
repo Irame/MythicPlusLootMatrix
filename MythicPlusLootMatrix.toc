@@ -4,6 +4,7 @@
 ## Version: @project-version@
 ## IconTexture: Interface\AddOns\MythicPlusLootMatrix\Images\Icon
 ## AddonCompartmentFunc: MPLM_OnAddonCompartmentClick
+## SavedVariables: MythicPlusLootMatrixDB
 
 # External code + initialization
 embeds.xml

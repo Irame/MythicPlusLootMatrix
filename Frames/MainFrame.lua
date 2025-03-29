@@ -78,9 +78,6 @@ function MPLM_MainFrameMixin:OnLoad()
 
     ---@type DungeonInfo[]
     self.dungeonInfos = {}
-
-    ---@type table<Enum.ItemSlotFilterType, boolean>
-    self.slotActive = {}
 end
 
 function MPLM_MainFrameMixin:Init()
@@ -183,24 +180,18 @@ function MPLM_MainFrameMixin:SetupStatSearchDropdown()
 end
 
 function MPLM_MainFrameMixin:SetupSlotsDropdown()
-    for filter, name in pairs(private.slotFilterToSlotName) do
-        if filter ~= Enum.ItemSlotFilterType.Other then
-            self.slotActive[filter] = true
-        end
-    end
-
     local function IsSelected(value)
-        return self.slotActive[value]
+        return private.db.char.slotActive[value]
     end
 
     local function SetSelected(value)
-        self.slotActive[value] = not self.slotActive[value]
+        private.db.char.slotActive[value] = not private.db.char.slotActive[value]
         self:DoScan()
     end
 
     local function SetAllSelect(value)
-        for index in pairs(self.slotActive) do
-            self.slotActive[index] = value
+        for index in pairs(private.db.char.slotActive) do
+            private.db.char.slotActive[index] = value
         end
         self:DoScan()
     end
@@ -284,7 +275,7 @@ function MPLM_MainFrameMixin:BuildMatrix()
 	local isLootSlotPresent = self:GetLootSlotsPresent();
     local slotToHeader = {}
     for filter, name in pairs(private.slotFilterToSlotName) do
-        if isLootSlotPresent[filter] and self.slotActive[filter] then
+        if isLootSlotPresent[filter] and private.db.char.slotActive[filter] then
             local slotHeader = self.slotHeaderPool:Acquire() --[[@as MPLM_SlotHeader]]
             slotHeader:Init(filter)
 
@@ -300,7 +291,7 @@ function MPLM_MainFrameMixin:BuildMatrix()
         for j, itemId in ipairs(dungeonInfo.loot) do
             local itemInfo = self.itemCache[itemId]
 
-            if itemInfo and self.slotActive[itemInfo.filterType] then
+            if itemInfo and private.db.char.slotActive[itemInfo.filterType] then
                 local slotHeader = slotToHeader[itemInfo.filterType]
                 local currentButtons = itemButtonsPerSlot[slotHeader]
                 if not currentButtons then
