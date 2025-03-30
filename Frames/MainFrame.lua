@@ -1,6 +1,8 @@
 ---@class MPLM_Private
 local private = select(2, ...)
 
+local L = private.L
+
 ---@class DungeonInfo
 ---@field id number
 ---@field index number
@@ -65,6 +67,8 @@ MPLM_MainFrameMixin = {}
 
 function MPLM_MainFrameMixin:OnLoad()
     self:SetPortraitToAsset([[Interface\EncounterJournal\UI-EJ-PortraitIcon]]);
+
+    self.HideOtherItems:SetLabelText(L["Hide Others"])
 
     self:RegisterEvent("EJ_LOOT_DATA_RECIEVED")
 
@@ -166,7 +170,7 @@ function MPLM_MainFrameMixin:SetupStatSearchDropdown()
         end
 
         self.Stat1Search:SetupMenu(function(dropdown, rootDescription)
-            rootDescription:CreateRadio("All Stats", IsSelected, SetSelected, nil);
+            rootDescription:CreateRadio(L["All Stats"], IsSelected, SetSelected, nil);
 
             for key, shortName in pairs(private.statsShortened) do
                 rootDescription:CreateRadio(_G[key], IsSelected, SetSelected, key);
@@ -185,7 +189,7 @@ function MPLM_MainFrameMixin:SetupStatSearchDropdown()
         end
 
         self.Stat2Search:SetupMenu(function(dropdown, rootDescription)
-            rootDescription:CreateRadio("All Stats", IsSelected, SetSelected, nil);
+            rootDescription:CreateRadio(L["All Stats"], IsSelected, SetSelected, nil);
 
             for key, shortName in pairs(private.statsShortened) do
                 rootDescription:CreateRadio(_G[key], IsSelected, SetSelected, key);
@@ -210,8 +214,8 @@ function MPLM_MainFrameMixin:SetupSlotsDropdown()
     end
 
     self.SlotSelect:SetupMenu(function(dropdown, rootDescription)
-        rootDescription:CreateButton("Select All", SetAllSelect, true)
-        rootDescription:CreateButton("Unselect All", SetAllSelect, false)
+        rootDescription:CreateButton(L["Select All"], SetAllSelect, true)
+        rootDescription:CreateButton(L["Unselect All"], SetAllSelect, false)
 
         rootDescription:CreateDivider()
 

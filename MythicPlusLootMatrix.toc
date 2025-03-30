@@ -9,6 +9,8 @@
 # External code + initialization
 embeds.xml
 
+locales.xml
+
 # Frames
 Frames/ItemButton.xml
 Frames/MainFrame.xml

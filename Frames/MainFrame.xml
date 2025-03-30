@@ -118,7 +118,6 @@
             </DropdownButton>
             <Frame parentKey="HideOtherItems" inherits="ResizeCheckButtonTemplate">
                 <KeyValues>
-                    <KeyValue key="labelText" value="Hide Others" type="string"/>
                     <KeyValue key="labelFont" value="GameFontNormalMed2" type="string"/>
                     <KeyValue key="disabledLabelFont" value="GameFontDisableMed2" type="string"/>
                 </KeyValues>
@@ -128,7 +127,7 @@
             </Frame>
             <DropdownButton parentKey="SlotSelect" inherits="WowStyle1DropdownTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent.Stat2Search" relativePoint="RIGHT" x="200"/>
+                    <Anchor point="LEFT" relativeKey="$parent.Stat2Search" relativePoint="RIGHT" x="250"/>
                 </Anchors>
             </DropdownButton>
             <DropdownButton parentKey="Filter" inherits="WowStyle1DropdownTemplate">
@@ -144,17 +143,23 @@
         </Frames>
         <Layers>
             <Layer level="OVERLAY">
-                <FontString text="Search" inherits="GameFontNormal">
+                <FontString text="Stats:" inherits="GameFontNormalMed2">
                     <Anchors>
                         <Anchor point="RIGHT" relativeKey="$parent.Stat1Search" relativePoint="LEFT" x="-10"/>
                     </Anchors>
+                    <Scripts>
+                        <OnLoad function="MPLM_LocalizeFontString"/>
+                    </Scripts>
                 </FontString>
             </Layer>
             <Layer level="OVERLAY">
-                <FontString text="Slots" inherits="GameFontNormal">
+                <FontString text="Slots:" inherits="GameFontNormalMed2">
                     <Anchors>
                         <Anchor point="RIGHT" relativeKey="$parent.SlotSelect" relativePoint="LEFT" x="-10"/>
                     </Anchors>
+                    <Scripts>
+                        <OnLoad function="MPLM_LocalizeFontString"/>
+                    </Scripts>
                 </FontString>
             </Layer>
         </Layers>
