@@ -13,22 +13,7 @@ MPLM_MainFrame = MPLM_MainFrame
 
 function addon:OnInitialize()
     self:RegisterChatCommand("mplm", "ChatCommandHandler");
-
-    local dbDefaults = {
-        char = {
-            slotActive = {},
-            stat1SearchValue = nil,
-            stat2SearchValue = nil,
-        }
-    }
-
-    for filter in pairs(private.slotFilterToSlotName) do
-        if filter ~= Enum.ItemSlotFilterType.Other then
-            dbDefaults.char.slotActive[filter] = true
-        end
-    end
-
-    private.db = LibStub("AceDB-3.0"):New("MythicPlusLootMatrixDB", dbDefaults, true)
+    private:IntiializeDatabase()
 end
 
 function addon:OnEnable()

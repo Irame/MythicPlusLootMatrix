@@ -1,6 +1,8 @@
 ---@class MPLM_Private
 local private = select(2, ...)
 
+-- const tables
+
 private.statsShortened = {
     ITEM_MOD_CRIT_RATING_SHORT = "Crit.",
     ITEM_MOD_HASTE_RATING_SHORT = "Haste",
@@ -43,3 +45,56 @@ private.slotFilterToSlotName = {
 	[Enum.ItemSlotFilterType.Trinket] = INVTYPE_TRINKET,
 	[Enum.ItemSlotFilterType.Other] = EJ_LOOT_SLOT_FILTER_OTHER,
 }
+
+-- db utils
+
+local function GetDefaults()
+    local dbDefaults = {
+        char = {
+            slotsActivePerClassSpec = {
+                ["*"] = {}
+            },
+            stat1SearchValue = nil,
+            stat2SearchValue = nil,
+        }
+    }
+
+    for slot in pairs(private.slotFilterToSlotName) do
+        if slot ~= Enum.ItemSlotFilterType.Other then
+            dbDefaults.char.slotsActivePerClassSpec["*"][slot] = true
+        end
+    end
+
+    return dbDefaults
+end
+
+function private:IntiializeDatabase()
+    self.db = LibStub("AceDB-3.0"):New("MythicPlusLootMatrixDB", GetDefaults(), true)
+end
+
+local function GetActiveSlotKey(classId, specId)
+    local _, playerClassId = UnitClassBase("player")
+    if playerClassId == classId then
+        return tostring(classId).."-"..tostring(specId)
+    else
+        return "other"
+    end
+end
+
+function private:IsSlotActive(slot)
+    local key = GetActiveSlotKey(EJ_GetLootFilter())
+    return self.db.char.slotsActivePerClassSpec[key][slot]
+end
+
+function private:SetSlotActive(slot, value)
+    local key = GetActiveSlotKey(EJ_GetLootFilter())
+    self.db.char.slotsActivePerClassSpec[key][slot] = value
+end
+
+function private:SetAllSlotsActive(value)
+    local key = GetActiveSlotKey(EJ_GetLootFilter())
+    local slotsActive = self.db.char.slotsActivePerClassSpec[key]
+    for index in pairs(slotsActive) do
+        slotsActive[index] = value
+    end
+end

@@ -139,6 +139,7 @@ function MPLM_MainFrameMixin:SetupFilterDropdown()
         if EncounterJournal_OnFilterChanged then
             EncounterJournal_OnFilterChanged(EncounterJournal);
         end
+        self.SlotSelect:GenerateMenu()
         self:DoScan()
     end
 
@@ -194,19 +195,17 @@ function MPLM_MainFrameMixin:SetupStatSearchDropdown()
 end
 
 function MPLM_MainFrameMixin:SetupSlotsDropdown()
-    local function IsSelected(value)
-        return private.db.char.slotActive[value]
+    local function IsSelected(slot)
+        return private:IsSlotActive(slot)
     end
 
-    local function SetSelected(value)
-        private.db.char.slotActive[value] = not private.db.char.slotActive[value]
+    local function SetSelected(slot)
+        private:SetSlotActive(slot, not private:IsSlotActive(slot))
         self:UpdateMatrix()
     end
 
     local function SetAllSelect(value)
-        for index in pairs(private.db.char.slotActive) do
-            private.db.char.slotActive[index] = value
-        end
+        private:SetAllSlotsActive(value)
         self:UpdateMatrix()
     end
 
@@ -278,7 +277,7 @@ function MPLM_MainFrameMixin:IsItemVisible(itemInfo)
     return itemInfo
         and itemInfo.filterType
         and itemInfo.link
-        and private.db.char.slotActive[itemInfo.filterType]
+        and private:IsSlotActive(itemInfo.filterType)
         and (not self.hideOtherItems or self:MatchWithStatSearch(itemInfo.link))
         and true or false
 end
@@ -323,7 +322,7 @@ function MPLM_MainFrameMixin:BuildMatrix()
 	local isLootSlotPresent = self:GetLootSlotsPresent();
     local slotToHeader = {}
     for filter, name in pairs(private.slotFilterToSlotName) do
-        if isLootSlotPresent[filter] and private.db.char.slotActive[filter] then
+        if isLootSlotPresent[filter] and private:IsSlotActive(filter) then
             local slotHeader = self.slotHeaderPool:Acquire() --[[@as MPLM_SlotHeader]]
             slotHeader:Init(filter)
 
