@@ -96,12 +96,23 @@ function MPLM_MainFrameMixin:Init()
 end
 
 function MPLM_MainFrameMixin:OnShow()
+    if EncounterJournal and EncounterJournal:IsShown() then
+        EncounterJournal:Hide()
+    end
+
     self:DoScan()
+
+    if not self.EncounterJournalShowHooked then
+        hooksecurefunc(EncounterJournal, "Show", function()
+            self:Hide()
+        end)
+        self.EncounterJournalShowHooked = true
+    end
 end
 
 function MPLM_MainFrameMixin:OnEvent(event, ...)
     if event == "EJ_LOOT_DATA_RECIEVED" then
-        if not self.RescanTimer then
+        if self:IsShown() and not self.RescanTimer then
             self.RescanTimer = C_Timer.NewTimer(0.2, function()
                 self:DoScan()
                 self.RescanTimer = nil
