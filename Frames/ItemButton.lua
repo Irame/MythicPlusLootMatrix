@@ -81,17 +81,7 @@ end
 
 function MPLM_ItemButtonMixin:UpdateStats()
     if self.itemLink then
-        local stats = C_Item.GetItemStats(self.itemLink)
-
-        local statInfo = {}
-        for stat, value in pairs(stats) do
-            local statName = private.statsShortened[stat]
-            if statName then
-                tinsert(statInfo, {statName = statName, value = value})
-            end
-        end
-
-        table.sort(statInfo, function(a, b) return a.value < b.value end)
+        local statInfo = private:GetSortedStatsInfo(self.itemLink)
 
         if statInfo[1] then
             self.Stat1:SetText(statInfo[1].statName)

@@ -26,14 +26,14 @@
                         <Anchor point="CENTER" relativePoint="TOP" y="-2"/>
                     </Anchors>
                 </FontString>
-                <FontString parentKey="Stat1" inherits="MPLM_ItemStatFont" justifyH="LEFT">
+                <FontString parentKey="Stat2" inherits="MPLM_ItemStatFont" justifyH="LEFT">
                     <Anchors>
                         <Anchor point="BOTTOM" y="3"/>
                     </Anchors>
                 </FontString>
-                <FontString parentKey="Stat2" inherits="MPLM_ItemStatFont" justifyH="LEFT">
+                <FontString parentKey="Stat1" inherits="MPLM_ItemStatFont" justifyH="LEFT">
                     <Anchors>
-                        <Anchor point="BOTTOM" relativeKey="$parent.Stat1" relativePoint="TOP"/>
+                        <Anchor point="BOTTOM" relativeKey="$parent.Stat2" relativePoint="TOP"/>
                     </Anchors>
                 </FontString>
             </Layer>

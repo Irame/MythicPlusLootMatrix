@@ -248,12 +248,25 @@ function MPLM_MainFrameMixin:SetupHideOtherItemsCheckbox()
 	self.HideOtherItems:SetCallback(HideOtherItemsToggled);
 end
 
+---@param itemLink string
+---@return integer|true|false|nil matchResult 2 = strong match, 1 = weak match, true = all stats match, false = no match, nil = invalid item link
 function MPLM_MainFrameMixin:MatchWithStatSearch(itemLink)
     if not itemLink then return nil end
 
-    local stats = C_Item.GetItemStats(itemLink)
-    local result = (stats[private.db.char.stat1SearchValue] and 1 or 0) + (stats[private.db.char.stat2SearchValue] and 1 or 0)
-    return result > 0 and result or (not private.db.char.stat1SearchValue or not private.db.char.stat2SearchValue)
+    -- different behaviour if both stat search boxes are set to the same value
+    -- then we have a strong match if the higher stat is the selected stat
+    -- and a weak match if the lower stat is the selected stat
+    if private.db.char.stat1SearchValue and private.db.char.stat1SearchValue == private.db.char.stat2SearchValue then
+        local searchValue = private.db.char.stat1SearchValue
+        local orderedStats = private:GetSortedStatsInfo(itemLink)
+        if orderedStats[1] and orderedStats[1].statKey == searchValue then return 2 end
+        if orderedStats[2] and orderedStats[2].statKey == searchValue then return 1 end
+        return false
+    else
+        local stats = C_Item.GetItemStats(itemLink)
+        local result = (stats[private.db.char.stat1SearchValue] and 1 or 0) + (stats[private.db.char.stat2SearchValue] and 1 or 0)
+        return result > 0 and result or (not private.db.char.stat1SearchValue or not private.db.char.stat2SearchValue)
+    end
 end
 
 function MPLM_MainFrameMixin:UpdateSearchGlow()
