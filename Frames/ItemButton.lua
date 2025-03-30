@@ -164,6 +164,8 @@ function MPLM_ItemButtonMixin:OnClick()
 end
 
 function MPLM_ItemButtonMixin:OnSizeChanged(width, height)
+    self.Stat2:SetPoint("BOTTOM", 0, height/8-1)
+
     if self.SpellActivationAlert then
         self.SpellActivationAlert:SetSize(width * 1.4, height * 1.4)
         self.SpellActivationAlert.ProcStartFlipbook:SetSize(width*3.5, height*3.5)
