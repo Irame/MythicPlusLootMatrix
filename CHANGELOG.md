@@ -1,3 +1,1 @@
-- Option hide specific slots
-- Option to hide items that dont match the stat filter
-- These otpions are saved per character
+- Saves the selected slots per spec for the class of the player
