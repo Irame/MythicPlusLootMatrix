@@ -1,1 +1,3 @@
-- Saves the selected slots per spec for the class of the player
+- Saves the selected slots per specialization for the player's class
+- Added German localization
+- When both stat filters are set to the same value, highlighting now prioritizes the item with a higher amount of the selected stat
