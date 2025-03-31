@@ -230,10 +230,8 @@ function MPLM_MainFrameMixin:SetupSlotsDropdown()
 
         rootDescription:CreateDivider()
 
-        for filter, name in pairs(private.slotFilterToSlotName) do
-            if filter ~= Enum.ItemSlotFilterType.Other then
-                rootDescription:CreateCheckbox(name, IsSelected, SetSelected, filter);
-            end
+        for i, filter in ipairs(private.slotFilterOrdered) do
+            rootDescription:CreateCheckbox(private.slotFilterToSlotName[filter], IsSelected, SetSelected, filter);
         end
     end);
 end
@@ -349,7 +347,7 @@ function MPLM_MainFrameMixin:BuildMatrix()
 
 	local isLootSlotPresent = self:GetLootSlotsPresent();
     local slotToHeader = {}
-    for filter, name in pairs(private.slotFilterToSlotName) do
+    for i, filter in pairs(private.slotFilterOrdered) do
         if isLootSlotPresent[filter] and private:IsSlotActive(filter) then
             local slotHeader = self.slotHeaderPool:Acquire() --[[@as MPLM_SlotHeader]]
             slotHeader:Init(filter)

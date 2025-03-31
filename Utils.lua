@@ -46,6 +46,23 @@ private.slotFilterToSlotName = {
 	[Enum.ItemSlotFilterType.Other] = EJ_LOOT_SLOT_FILTER_OTHER,
 }
 
+private.slotFilterOrdered = {
+    Enum.ItemSlotFilterType.Head,
+    Enum.ItemSlotFilterType.Neck,
+    Enum.ItemSlotFilterType.Shoulder,
+    Enum.ItemSlotFilterType.Cloak,
+    Enum.ItemSlotFilterType.Chest,
+    Enum.ItemSlotFilterType.Wrist,
+    Enum.ItemSlotFilterType.Hand,
+    Enum.ItemSlotFilterType.Waist,
+    Enum.ItemSlotFilterType.Legs,
+    Enum.ItemSlotFilterType.Feet,
+    Enum.ItemSlotFilterType.Finger,
+    Enum.ItemSlotFilterType.Trinket,
+    Enum.ItemSlotFilterType.MainHand,
+    Enum.ItemSlotFilterType.OffHand,
+}
+
 -- db utils
 
 local function GetDefaults()
@@ -59,10 +76,8 @@ local function GetDefaults()
         }
     }
 
-    for slot in pairs(private.slotFilterToSlotName) do
-        if slot ~= Enum.ItemSlotFilterType.Other then
-            dbDefaults.char.slotsActivePerClassSpec["*"][slot] = true
-        end
+    for i, filter in ipairs(private.slotFilterOrdered) do
+        dbDefaults.char.slotsActivePerClassSpec["*"][filter] = true
     end
 
     return dbDefaults
@@ -93,9 +108,8 @@ end
 
 function private:SetAllSlotsActive(value)
     local key = GetActiveSlotKey(EJ_GetLootFilter())
-    local slotsActive = self.db.char.slotsActivePerClassSpec[key]
-    for index in pairs(slotsActive) do
-        slotsActive[index] = value
+    for i, filter in ipairs(private.slotFilterOrdered) do
+        self.db.char.slotsActivePerClassSpec[key][filter] = value
     end
 end
 
