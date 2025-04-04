@@ -262,6 +262,7 @@ function MPLM_MainFrameMixin:MatchWithStatSearch(itemLink)
         return false
     else
         local stats = C_Item.GetItemStats(itemLink)
+        if not stats then return nil end
         local result = (stats[private.db.char.stat1SearchValue] and 1 or 0) + (stats[private.db.char.stat2SearchValue] and 1 or 0)
         return result > 0 and result or (not private.db.char.stat1SearchValue or not private.db.char.stat2SearchValue)
     end

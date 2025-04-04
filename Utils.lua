@@ -125,6 +125,10 @@ end
 function private:GetSortedStatsInfo(itemLink)
     local stats = C_Item.GetItemStats(itemLink)
 
+    if not stats then
+        return {}
+    end
+
     local statInfo = {}
     for stat, value in pairs(stats) do
         local statName = private.statsShortened[stat]
