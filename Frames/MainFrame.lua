@@ -9,14 +9,17 @@ local L = private.L
 ---@field name string
 ---@field image string
 ---@field loot number[]
+---@field mapId integer
 
 ---@class MPLM_DungeonHeader : Frame
 ---@field Image Texture
 ---@field Label FontString
+---@field DungeonHighlight Texture
 MPLM_DungeonHeaderMixin = {}
 
 ---@param dungeonInfo DungeonInfo
 function MPLM_DungeonHeaderMixin:Init(dungeonInfo)
+    self.dungeonInfo = dungeonInfo
     self.Image:SetTexture(dungeonInfo.image)
     self.Label:SetText(dungeonInfo.name)
 end
@@ -25,9 +28,19 @@ function MPLM_DungeonHeaderMixin:OnSizeChanged(width, height)
     self.Image:SetWidth(height-5);
 end
 
+function MPLM_DungeonHeaderMixin:SetDungeonHighlight(value)
+    self.DungeonHighlight:SetShown(value)
+end
+
+function MPLM_DungeonHeaderMixin:Reset()
+    self.dungeonInfo = nil
+    self.DungeonHighlight:Hide()
+end
+
 ---@class MPLM_SlotHeader : Frame
 ---@field EquippedItem1Button MPLM_ItemButton
 ---@field EquippedItem2Button MPLM_ItemButton
+---@field DungeonHighlight Texture
 MPLM_SlotHeaderMixin = {}
 
 function MPLM_SlotHeaderMixin:Init(slot)
@@ -52,6 +65,14 @@ function MPLM_SlotHeaderMixin:Init(slot)
     end
 end
 
+function MPLM_SlotHeaderMixin:SetDungeonHighlight(value)
+    self.DungeonHighlight:SetShown(value)
+end
+
+function MPLM_SlotHeaderMixin:Reset()
+    self.DungeonHighlight:Hide()
+end
+
 ---@class MPLM_SlotHeader : Frame
 ---@field Label FontString
 
@@ -65,6 +86,14 @@ end
 ---@field HideOtherItems any
 MPLM_MainFrameMixin = {}
 
+local function PoolDefaultReset(pool, region)
+    if region.Reset then
+        region:Reset()
+    end
+    region:Hide()
+    region:ClearAllPoints()
+end
+
 function MPLM_MainFrameMixin:OnLoad()
     self:SetPortraitToAsset([[Interface\EncounterJournal\UI-EJ-PortraitIcon]]);
 
@@ -74,9 +103,9 @@ function MPLM_MainFrameMixin:OnLoad()
 
     self.ResizeButton:Init(self, 1100, 670, 1100*1.5, 670*1.5);
 
-    self.dungeonHeaderPool = CreateFramePool("Frame", self, "MPLM_DungeonHeaderTemplate")
-    self.slotHeaderPool = CreateFramePool("Frame", self, "MPLM_SlotHeaderTemplate")
-    self.itemButtonPool = CreateFramePool("Button", self, "MPLM_ItemButtonTemplate", function(pool, button) button:Reset() end)
+    self.dungeonHeaderPool = CreateFramePool("Frame", self, "MPLM_DungeonHeaderTemplate", PoolDefaultReset)
+    self.slotHeaderPool = CreateFramePool("Frame", self, "MPLM_SlotHeaderTemplate", PoolDefaultReset)
+    self.itemButtonPool = CreateFramePool("Button", self, "MPLM_ItemButtonTemplate", PoolDefaultReset)
 
     ---@type table<number, EncounterJournalItemInfo>
     self.itemCache = {}
@@ -136,6 +165,7 @@ function MPLM_MainFrameMixin:UpdateMatrix()
     self.matrixFrames = self:BuildMatrix()
     self:LayoutMatrix(self.matrixFrames)
     self:UpdateSearchGlow()
+    self:UpdateDungeonHighlight()
 end
 
 function MPLM_MainFrameMixin:SetupFilterDropdown()
@@ -284,6 +314,23 @@ function MPLM_MainFrameMixin:UpdateSearchGlow()
             button:HideStrongHighlight()
             button:HideWeakHighlight()
         end
+    end
+end
+
+function MPLM_MainFrameMixin:UpdateDungeonHighlight()
+    local _, _, _, _, _, _, _, instanceID, _, _ = GetInstanceInfo()
+    local itemButtonsOfHighlightedDungeon = nil
+    for dungeonHeader, itemButtonsPerDungeon in pairs(self.matrixFrames.itemButtons) do
+        local dungeonHighlighted = instanceID == dungeonHeader.dungeonInfo.mapId
+        dungeonHeader:SetDungeonHighlight(dungeonHighlighted)
+
+        if dungeonHighlighted then
+            itemButtonsOfHighlightedDungeon = itemButtonsPerDungeon
+        end
+    end
+
+    for i, slotHeader in ipairs(self.matrixFrames.slotHeaders) do
+        slotHeader:SetDungeonHighlight(itemButtonsOfHighlightedDungeon and itemButtonsOfHighlightedDungeon[slotHeader] ~= nil)
     end
 end
 
@@ -470,11 +517,10 @@ function MPLM_MainFrameMixin:ScanDungeons()
     ---@type DungeonInfo[]
     local dungeonInfos = {}
 
-    local imageRelative = nil
     local instanceIdx = 0
     while true do
         instanceIdx = instanceIdx + 1
-        local instanceId, instanceName, _, _, _, _, image2 = EJ_GetInstanceByIndex(instanceIdx, false)
+        local instanceId, instanceName, _, _, _, _, image2, _, _, _, mapId  = EJ_GetInstanceByIndex(instanceIdx, false)
 
         if not instanceId then
             break
@@ -506,6 +552,7 @@ function MPLM_MainFrameMixin:ScanDungeons()
             name = instanceName,
             image = image2,
             loot = itemIds,
+            mapId = mapId,
         })
     end
 

@@ -49,8 +49,6 @@ function MPLM_ItemButtonMixin:Reset()
     self.itemLink = nil
     self:HideStrongHighlight()
     self:HideWeakHighlight()
-    self:Hide()
-    self:ClearAllPoints()
 end
 
 function MPLM_ItemButtonMixin:ShowStrongHighlight()

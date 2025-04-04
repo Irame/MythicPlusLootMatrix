@@ -32,6 +32,13 @@
                         <Anchor point="BOTTOMRIGHT" y="-2.5"/>
                     </Anchors>
                 </Texture>
+                <Texture parentKey="DungeonHighlight" hidden="true">
+                    <Color r="0.96" g="0.83" b="0.25" a="0.1"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" y="-2.5"/>
+                        <Anchor point="BOTTOMRIGHT" y="-2.5"/>
+                    </Anchors>
+                </Texture>
             </Layer>
         </Layers>
         <Scripts>
@@ -71,6 +78,13 @@
                         <Anchor point="TOP" relativeKey="$parent.Label" y="2"/>
                         <Anchor point="LEFT" x="2.5"/>
                         <Anchor point="BOTTOMRIGHT" x="2.5"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="DungeonHighlight" hidden="true">
+                    <Color r="0.96" g="0.83" b="0.25" a="0.05"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" y="-2.5"/>
+                        <Anchor point="BOTTOMRIGHT" y="-2.5"/>
                     </Anchors>
                 </Texture>
             </Layer>
