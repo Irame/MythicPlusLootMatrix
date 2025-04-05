@@ -163,6 +163,7 @@ end
 
 function MPLM_MainFrameMixin:UpdateMatrix()
     self.matrixFrames = self:BuildMatrix()
+    self:UpdatSizeConstraints(self.matrixFrames)
     self:LayoutMatrix(self.matrixFrames)
     self:UpdateSearchGlow()
     self:UpdateDungeonHighlight()
@@ -331,6 +332,34 @@ function MPLM_MainFrameMixin:UpdateDungeonHighlight()
 
     for i, slotHeader in ipairs(self.matrixFrames.slotHeaders) do
         slotHeader:SetDungeonHighlight(itemButtonsOfHighlightedDungeon and itemButtonsOfHighlightedDungeon[slotHeader] ~= nil)
+    end
+end
+
+function MPLM_MainFrameMixin:UpdatSizeConstraints(matrixFrames)
+    local absoulteMinWidth = 925
+
+    local minHeight = #matrixFrames.dungeonHeaders * 65 + 140
+    local minWidth = math.max(absoulteMinWidth, #matrixFrames.slotHeaders * 65 + 80)
+
+    local maxHeight = minHeight * 1.5
+    local maxWidth = math.max(absoulteMinWidth, #matrixFrames.slotHeaders * 110 + 80)
+
+    self.ResizeButton.minHeight = minHeight
+    self.ResizeButton.minWidth = minWidth
+    self.ResizeButton.maxHeight = maxHeight
+    self.ResizeButton.maxWidth = maxWidth
+
+    if self:GetHeight() < minHeight then
+        self:SetHeight(minHeight)
+    end
+    if self:GetWidth() < minWidth then
+        self:SetWidth(minWidth)
+    end
+    if self:GetHeight() > maxHeight then
+        self:SetHeight(maxHeight)
+    end
+    if self:GetWidth() > maxWidth then
+        self:SetWidth(maxWidth)
     end
 end
 
