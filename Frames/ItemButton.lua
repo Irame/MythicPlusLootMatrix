@@ -8,7 +8,7 @@ local private = select(2, ...)
 ---@field Stat1 FontString
 ---@field Stat2 FontString
 ---@field ItemLevel FontString
----@field AutoCastOverlay any
+---@field AutoCastOverlay SpellBookItemAutoCastTemplate
 ---@field SpellActivationAlert? Frame
 MPLM_ItemButtonMixin = {}
 

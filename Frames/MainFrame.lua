@@ -38,6 +38,7 @@ function MPLM_DungeonHeaderMixin:Reset()
 end
 
 ---@class MPLM_SlotHeader : Frame
+---@field Label FontString
 ---@field EquippedItem1Button MPLM_ItemButton
 ---@field EquippedItem2Button MPLM_ItemButton
 ---@field DungeonHighlight Texture
@@ -73,17 +74,13 @@ function MPLM_SlotHeaderMixin:Reset()
     self.DungeonHighlight:Hide()
 end
 
----@class MPLM_SlotHeader : Frame
----@field Label FontString
-
----@class MPLM_MainFrame : Frame
----@field Filter Frame
----@field ResizeButton Button
----@field SetPortraitToAsset fun(self, texturePath: string)
----@field Stat1Search any
----@field Stat2Search any
----@field SlotSelect any
----@field HideOtherItems any
+---@class MPLM_MainFrame : PortraitFrameFlatTemplate
+---@field Filter WowStyle1DropdownTemplate
+---@field ResizeButton PanelResizeButtonTemplate
+---@field Stat1Search WowStyle1DropdownTemplate
+---@field Stat2Search WowStyle1DropdownTemplate
+---@field SlotSelect WowStyle1DropdownTemplate
+---@field HideOtherItems ResizeCheckButtonTemplate
 MPLM_MainFrameMixin = {}
 
 local function PoolDefaultReset(pool, region)
