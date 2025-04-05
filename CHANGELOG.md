@@ -1,3 +1,4 @@
-- Saves the selected slots per specialization for the player's class
-- Added German localization
-- When both stat filters are set to the same value, highlighting now prioritizes the item with a higher amount of the selected stat
+- Improved item button layouting
+- Highlighting of current dungeon
+- Slots are now ordered like in the character frame
+- Bugfixes and improvements
