@@ -83,12 +83,22 @@ end
 ---@field HideOtherItems ResizeCheckButtonTemplate
 MPLM_MainFrameMixin = {}
 
-local function PoolDefaultReset(pool, region)
+local function FramePoolDefaultReset(pool, region)
     if region.Reset then
         region:Reset()
     end
     region:Hide()
     region:ClearAllPoints()
+end
+
+local function ObjectPoolDefaultReset(pool, object)
+    if object.Reset then
+        object:Reset()
+    end
+end
+
+local function ItemButtonContainerPoolCreate(pool)
+    return private.ctor.ItemButtonContainer()
 end
 
 function MPLM_MainFrameMixin:OnLoad()
@@ -100,9 +110,10 @@ function MPLM_MainFrameMixin:OnLoad()
 
     self.ResizeButton:Init(self, 1100, 670, 1100*1.5, 670*1.5);
 
-    self.dungeonHeaderPool = CreateFramePool("Frame", self, "MPLM_DungeonHeaderTemplate", PoolDefaultReset)
-    self.slotHeaderPool = CreateFramePool("Frame", self, "MPLM_SlotHeaderTemplate", PoolDefaultReset)
-    self.itemButtonPool = CreateFramePool("Button", self, "MPLM_ItemButtonTemplate", PoolDefaultReset)
+    self.dungeonHeaderPool = CreateFramePool("Frame", self, "MPLM_DungeonHeaderTemplate", FramePoolDefaultReset)
+    self.slotHeaderPool = CreateFramePool("Frame", self, "MPLM_SlotHeaderTemplate", FramePoolDefaultReset)
+    self.itemButtonPool = CreateFramePool("Button", nil, "MPLM_ItemButtonTemplate", FramePoolDefaultReset)
+    self.itemButtonContainerPool = CreateObjectPool(ItemButtonContainerPoolCreate, ObjectPoolDefaultReset)
 
     ---@type table<number, EncounterJournalItemInfo>
     self.itemCache = {}
@@ -394,12 +405,13 @@ end
 ---@class MatrixFrames
 ---@field dungeonHeaders MPLM_DungeonHeader[]
 ---@field slotHeaders MPLM_SlotHeader[]
----@field itemButtons table<MPLM_DungeonHeader, table<MPLM_SlotHeader, MPLM_ItemButton[]>>
+---@field itemButtons table<MPLM_DungeonHeader, table<MPLM_SlotHeader, ItemButtonContainer>>
 
 function MPLM_MainFrameMixin:BuildMatrix()
     self.dungeonHeaderPool:ReleaseAll()
     self.slotHeaderPool:ReleaseAll()
     self.itemButtonPool:ReleaseAll()
+    self.itemButtonContainerPool:ReleaseAll()
 
     ---@type MatrixFrames
     local matrixFrames = {
@@ -435,26 +447,27 @@ function MPLM_MainFrameMixin:BuildMatrix()
         local dungeonHeader = dungeonToHeader[dungeonInfo.id]
 
         if dungeonHeader then
-            local itemButtonsPerSlot = {}
+            local itemButtonsFrames = {}
             for j, itemId in ipairs(dungeonInfo.loot) do
                 local itemInfo = self.itemCache[itemId]
 
                 if self:IsItemVisible(itemInfo) then
                     local slotHeader = slotToHeader[itemInfo.filterType]
-                    local currentButtons = itemButtonsPerSlot[slotHeader]
-                    if not currentButtons then
-                        currentButtons = {}
-                        itemButtonsPerSlot[slotHeader] = currentButtons
+                    local currentButtonContainer = itemButtonsFrames[slotHeader]
+                    if not currentButtonContainer then
+                        currentButtonContainer = self.itemButtonContainerPool:Acquire() --[[@as ItemButtonContainer]]
+                        currentButtonContainer:Init(2, 2, self, dungeonHeader, slotHeader)
+                        itemButtonsFrames[slotHeader] = currentButtonContainer
                     end
 
                     local itemButton = self.itemButtonPool:Acquire() --[[@as MPLM_ItemButton]]
                     itemButton:Init(itemInfo)
 
-                    tinsert(currentButtons, itemButton)
+                    currentButtonContainer:AddButton(itemButton)
                 end
             end
 
-            matrixFrames.itemButtons[dungeonHeader] = itemButtonsPerSlot
+            matrixFrames.itemButtons[dungeonHeader] = itemButtonsFrames
         end
     end
 
@@ -505,22 +518,9 @@ function MPLM_MainFrameMixin:LayoutMatrix(matrixData)
         lastSlotHeader = slotHeader
     end
 
-    local itemSpaceWidth = slotWidth - dividerSize;
-    local itemSpaceHeight = dungenHeight - dividerSize;
-    local minDimSize = math.min(itemSpaceWidth, itemSpaceHeight)
-    local itemIconSize = minDimSize/2
-
     for dungeonHeader, itemButtonsPerDungeon in pairs(matrixData.itemButtons) do
-        for slotHeader, itemButtonsPerCell in pairs(itemButtonsPerDungeon) do
-            for k, itemButton in ipairs(itemButtonsPerCell) do
-                itemButton:SetSize(itemIconSize, itemIconSize)
-
-                local xOffset = ((k-1)%2 * itemIconSize) + (itemSpaceWidth-minDimSize)/2 + dividerSize
-                local yOffset = -(math.floor((k-1)/2) * itemIconSize) - (itemSpaceHeight-minDimSize)/2 - dividerSize
-                itemButton:SetPoint("LEFT", slotHeader, "LEFT", xOffset, 0)
-                itemButton:SetPoint("TOP", dungeonHeader, "TOP", 0, yOffset)
-                itemButton:Show()
-            end
+        for slotHeader, itemButtonsFrame in pairs(itemButtonsPerDungeon) do
+            itemButtonsFrame:DoLayout()
         end
     end
 end

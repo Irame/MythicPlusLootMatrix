@@ -11,9 +11,13 @@ embeds.xml
 
 locales.xml
 
+Utils.lua
+
+# Classes
+ItemButtonContainer.lua
+
 # Frames
 Frames/ItemButton.xml
 Frames/MainFrame.xml
 
-Utils.lua
 Main.lua

@@ -1,6 +1,8 @@
 ---@class MPLM_Private
 local private = select(2, ...)
 
+private.ctor = {}
+
 -- const tables
 
 private.statsShortened = {

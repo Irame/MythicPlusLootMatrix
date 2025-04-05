@@ -59,6 +59,7 @@
         "ActionButton_ShowOverlayGlow",
         "ActionButton_HideOverlayGlow",
         "PlayerSpellsFrame_LoadUI",
-        "ActionButton_SetupOverlayGlow"
+        "ActionButton_SetupOverlayGlow",
+        "CreateObjectPool"
     ]
 }
