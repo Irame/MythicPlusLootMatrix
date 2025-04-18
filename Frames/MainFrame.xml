@@ -154,6 +154,24 @@
                     <Anchor point="BOTTOMRIGHT" x="-4" y="4"/>
                 </Anchors>
             </Button>
+            <Button parentKey="SettingsButton" mixin="MPLM_SettingsButtonMixin">
+                <Size x="40" y="40"/>
+                <NormalTexture atlas="GM-icon-settings"/>
+                <KeyValues>
+                    <KeyValue key="atlasKey" value="GM-icon-settings" type="string" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="0" y="-50"/>
+                </Anchors>
+                <Scripts>
+                    <OnLoad method="OnLoad"/>
+                    <OnMouseDown method="OnMouseDown"/>
+                    <OnMouseUp method="OnMouseUp"/>
+                    <OnEnter method="OnEnter"/>
+                    <OnLeave method="OnLeave"/>
+                    <OnClick method="OnClick"/>
+                </Scripts>
+            </Button>
         </Frames>
         <Layers>
             <Layer level="OVERLAY">

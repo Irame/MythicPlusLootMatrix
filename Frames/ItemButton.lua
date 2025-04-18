@@ -9,7 +9,7 @@ local private = select(2, ...)
 ---@field Stat2 FontString
 ---@field ItemLevel FontString
 ---@field AutoCastOverlay SpellBookItemAutoCastTemplate
----@field SpellActivationAlert? Frame
+---@field SpellActivationAlert? ActionBarButtonSpellActivationAlert
 MPLM_ItemButtonMixin = {}
 
 ---@param itemInfoOrLink? EncounterJournalItemInfo | string

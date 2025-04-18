@@ -21,7 +21,12 @@ MPLM_DungeonHeaderMixin = {}
 function MPLM_DungeonHeaderMixin:Init(dungeonInfo)
     self.dungeonInfo = dungeonInfo
     self.Image:SetTexture(dungeonInfo.image)
-    self.Label:SetText(dungeonInfo.name)
+
+    local dungeonName = dungeonInfo.name
+    if private.db.global.useShortDungeonNames and private.dungeonShorthands[dungeonInfo.id] then
+        dungeonName = private.dungeonShorthands[dungeonInfo.id]
+    end
+    self.Label:SetText(dungeonName)
 end
 
 function MPLM_DungeonHeaderMixin:OnSizeChanged(width, height)
@@ -74,6 +79,43 @@ function MPLM_SlotHeaderMixin:Reset()
     self.DungeonHighlight:Hide()
 end
 
+---@class MPLM_ButtonStateBehavior : ButtonStateBehaviorMixin, Button
+---@field atlasKey string
+MPLM_ButtonStateBehaviorMixin = CreateFromMixins(ButtonStateBehaviorMixin);
+
+function MPLM_ButtonStateBehaviorMixin:OnButtonStateChanged()
+	local atlas = self.atlasKey;
+	if self:IsDownOver() or self:IsOver() then
+		atlas = atlas.."-hover";
+	elseif self:IsDown() then
+		atlas = atlas.."-pressed";
+	end
+
+	self:GetNormalTexture():SetAtlas(atlas, TextureKitConstants.IgnoreAtlasSize);
+end
+
+---@class MPLM_SettingsButton : MPLM_ButtonStateBehavior
+MPLM_SettingsButtonMixin = CreateFromMixins(MPLM_ButtonStateBehaviorMixin);
+
+---@param mainFrame MPLM_MainFrame
+function MPLM_SettingsButtonMixin:Init(mainFrame)
+    self.mainFrame = mainFrame
+end
+
+function MPLM_SettingsButtonMixin:OnClick()
+    MenuUtil.CreateContextMenu(self, function(button, rootDescription)
+        rootDescription:CreateTitle(L["Settings"])
+        rootDescription:CreateCheckbox(L["Use Short Dungeon Names"],
+            function ()
+                return private.db.global.useShortDungeonNames
+            end,
+            function ()
+                private.db.global.useShortDungeonNames = not private.db.global.useShortDungeonNames
+                self.mainFrame:UpdateMatrix()
+            end)
+    end)
+end
+
 ---@class MPLM_MainFrame : PortraitFrameFlatTemplate
 ---@field Filter WowStyle1DropdownTemplate
 ---@field ResizeButton PanelResizeButtonTemplate
@@ -81,6 +123,7 @@ end
 ---@field Stat2Search WowStyle1DropdownTemplate
 ---@field SlotSelect WowStyle1DropdownTemplate
 ---@field HideOtherItems ResizeCheckButtonTemplate
+---@field SettingsButton MPLM_SettingsButton
 MPLM_MainFrameMixin = {}
 
 local function FramePoolDefaultReset(pool, region)
@@ -130,6 +173,7 @@ function MPLM_MainFrameMixin:Init()
     self:SetupStatSearchDropdown()
     self:SetupSlotsDropdown()
     self:SetupHideOtherItemsCheckbox()
+    self.SettingsButton:Init(self)
 end
 
 function MPLM_MainFrameMixin:OnShow()

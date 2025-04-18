@@ -12,6 +12,18 @@ private.statsShortened = {
     ITEM_MOD_VERSATILITY = "Vers.",
 }
 
+---@type table<integer, string>
+private.dungeonShorthands = {
+    [1272] = "BREW",
+    [1210] = "DFC",
+    [1267] = "PSF",
+    [1268] = "ROOK",
+    [1298] = "FLOOD",
+    [1187] = "TOP",
+    [1178] = "WORK",
+    [1012] = "ML",
+}
+
 ---@type table<Enum.ItemSlotFilterType, integer[]>
 private.slotFilterToSlotIDs = {
     [Enum.ItemSlotFilterType.Head] = {1},
@@ -75,7 +87,10 @@ local function GetDefaults()
             },
             stat1SearchValue = nil,
             stat2SearchValue = nil,
-        }
+        },
+        global = {
+            useShortDungeonNames = false,
+        },
     }
 
     for i, filter in ipairs(private.slotFilterOrdered) do
