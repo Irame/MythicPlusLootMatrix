@@ -1,4 +1,2 @@
-- Improved item button layouting
-- Highlighting of current dungeon
-- Slots are now ordered like in the character frame
-- Bugfixes and improvements
+- Updated for 11.1.5
+- Added option to show dungen shorthands
