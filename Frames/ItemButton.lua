@@ -53,17 +53,15 @@ end
 
 function MPLM_ItemButtonMixin:ShowStrongHighlight()
     self:HideWeakHighlight()
-    if not self.SpellActivationAlert then
-		ActionButton_SetupOverlayGlow(self)
-        local width, height = self:GetSize()
-        self.SpellActivationAlert.ProcStartFlipbook:SetSize(width*3.5, height*3.5)
-	end
 
-    ActionButton_ShowOverlayGlow(self)
+    ActionButtonSpellAlertManager:ShowAlert(self)
+
+    local width, height = self:GetSize()
+    self.SpellActivationAlert.ProcStartFlipbook:SetSize(width*3.5, height*3.5)
 end
 
 function MPLM_ItemButtonMixin:HideStrongHighlight()
-    ActionButton_HideOverlayGlow(self)
+    ActionButtonSpellAlertManager:HideAlert(self)
 end
 
 function MPLM_ItemButtonMixin:ShowWeakHighlight()
