@@ -1,4 +1,4 @@
-## Interface: 110105
+## Interface: 110200
 ## Title: Mythic Plus Loot Matrix
 ## Notes: Provides an overview of mythic plus loot.
 ## Version: @project-version@
