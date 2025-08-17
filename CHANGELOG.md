@@ -1,2 +1,1 @@
-- Updated for 11.1.5
-- Added option to show dungen shorthands
+- Updated for 11.2.0
