@@ -22,6 +22,14 @@ private.dungeonShorthands = {
     [1187] = "TOP",
     [1178] = "WORK",
     [1012] = "ML",
+    [1271] = "ARAK",
+    [1270] = "DAWN",
+    [1303] = "EDA",
+    [1185] = "HOA",
+
+    -- lfgDungeonIds
+    [2329] = "STRT",
+    [2330] = "GMBT",
 }
 
 ---@type table<Enum.ItemSlotFilterType, integer[]>
