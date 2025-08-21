@@ -470,7 +470,7 @@ function MPLM_MainFrameMixin:BuildMatrix()
             local dungeonHeader = self.dungeonHeaderPool:Acquire() --[[@as MPLM_DungeonHeader]]
             dungeonHeader:Init(dungeonInfo)
 
-            dungeonToHeader[dungeonInfo.id] = dungeonHeader
+            dungeonToHeader[i] = dungeonHeader
             tinsert(matrixFrames.dungeonHeaders, dungeonHeader)
         end
     end
@@ -488,7 +488,7 @@ function MPLM_MainFrameMixin:BuildMatrix()
     end
 
     for i, dungeonInfo in ipairs(self.dungeonInfos) do
-        local dungeonHeader = dungeonToHeader[dungeonInfo.id]
+        local dungeonHeader = dungeonToHeader[i]
 
         if dungeonHeader then
             local itemButtonsFrames = {}
@@ -569,6 +569,43 @@ function MPLM_MainFrameMixin:LayoutMatrix(matrixData)
     end
 end
 
+local dungeonSplits = {
+    [1194] = { -- Tazavesh, the Veiled Market
+        [1] = { -- Tazavesh: Streets of Wonder
+            lfgDungeonId = 2329,
+            encounters = {
+                2437,  -- Zo'phex the Sentinel
+                2454,  -- The Grand Menagerie
+                2436,  -- Mailroom Mayhem
+                2452,  -- Myza's Oasis
+                2451,  -- So'azmi
+            }
+        },
+        [2] = { -- Tazavesh: So'leah's Gambit
+            lfgDungeonId = 2330,
+            encounters = {
+                2448, -- Hylbrande
+                2449, -- Timecap'n Hooktail
+                2455, -- So'leah
+            }
+        }
+    }
+}
+
+function MPLM_MainFrameMixin:GatherItems(itemIds)
+    for i = 1, EJ_GetNumLoot() do
+        local lootInfo = C_EncounterJournal.GetLootInfoByIndex(i)
+        if lootInfo and lootInfo.itemID and lootInfo.filterType ~= Enum.ItemSlotFilterType.Other then
+            tinsert(itemIds, lootInfo.itemID)
+
+            if lootInfo.name then
+                --private.addon:Print("Found loot: " .. lootInfo.name)
+                self.itemCache[lootInfo.itemID] = lootInfo
+            end
+        end
+    end
+end;
+
 function MPLM_MainFrameMixin:ScanDungeons()
     -- populates EncounterJournal global
     EncounterJournal_LoadUI()
@@ -602,28 +639,43 @@ function MPLM_MainFrameMixin:ScanDungeons()
 
         --private.addon:Print("Scanning instance: " .. instanceName)
 
-        local itemIds = {}
-        for i = 1, EJ_GetNumLoot() do
-            local lootInfo = C_EncounterJournal.GetLootInfoByIndex(i)
-            if lootInfo and lootInfo.itemID and lootInfo.filterType ~= Enum.ItemSlotFilterType.Other then
-                tinsert(itemIds, lootInfo.itemID)
-
-                if lootInfo.name then
-                    --private.addon:Print("Found loot: " .. lootInfo.name)
-                    self.itemCache[lootInfo.itemID] = lootInfo
+        if dungeonSplits[instanceId] then
+            private.addon:Print("Scanning split instance: " .. instanceName)
+            for i, split in ipairs(dungeonSplits[instanceId]) do
+                local itemIds = {}
+                for _, encounterId in pairs(split.encounters) do
+                    private.addon:Print("Scanning encounter: " .. EJ_GetEncounterInfo(encounterId))
+                    EJ_SelectEncounter(encounterId)
+                    self:GatherItems(itemIds)
                 end
-            end
-        end
 
-        tinsert(dungeonInfos, {
-            id = instanceId,
-            index = instanceIdx,
-            tier = EJ_GetCurrentTier(),
-            name = instanceName,
-            image = image2,
-            loot = itemIds,
-            mapId = mapId,
-        })
+                local dungeonInfo = C_LFGInfo.GetDungeonInfo(split.lfgDungeonId)
+                private.addon:Print("Found " .. #itemIds .. " items for " .. i .. ". split: " .. dungeonInfo.name)
+
+                tinsert(dungeonInfos, {
+                    id = split.lfgDungeonId,
+                    index = instanceIdx,
+                    tier = EJ_GetCurrentTier(),
+                    name = dungeonInfo.name,
+                    image = image2,
+                    loot = itemIds,
+                    mapId = mapId,
+                })
+            end
+        else
+            local itemIds = {}
+            self:GatherItems(itemIds)
+
+            tinsert(dungeonInfos, {
+                id = instanceId,
+                index = instanceIdx,
+                tier = EJ_GetCurrentTier(),
+                name = instanceName,
+                image = image2,
+                loot = itemIds,
+                mapId = mapId,
+            })
+        end
     end
 
     return dungeonInfos
