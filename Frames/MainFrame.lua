@@ -640,17 +640,17 @@ function MPLM_MainFrameMixin:ScanDungeons()
         --private.addon:Print("Scanning instance: " .. instanceName)
 
         if dungeonSplits[instanceId] then
-            private.addon:Print("Scanning split instance: " .. instanceName)
+            --private.addon:Print("Scanning split instance: " .. instanceName)
             for i, split in ipairs(dungeonSplits[instanceId]) do
                 local itemIds = {}
                 for _, encounterId in pairs(split.encounters) do
-                    private.addon:Print("Scanning encounter: " .. EJ_GetEncounterInfo(encounterId))
+                    --private.addon:Print("Scanning encounter: " .. EJ_GetEncounterInfo(encounterId))
                     EJ_SelectEncounter(encounterId)
                     self:GatherItems(itemIds)
                 end
 
                 local dungeonInfo = C_LFGInfo.GetDungeonInfo(split.lfgDungeonId)
-                private.addon:Print("Found " .. #itemIds .. " items for " .. i .. ". split: " .. dungeonInfo.name)
+                --private.addon:Print("Found " .. #itemIds .. " items for " .. i .. ". split: " .. dungeonInfo.name)
 
                 tinsert(dungeonInfos, {
                     id = split.lfgDungeonId,
