@@ -621,6 +621,8 @@ function MPLM_MainFrameMixin:ScanDungeons()
 
     C_EncounterJournal.ResetSlotFilter()
 
+    local firstInstanceId = nil
+
     ---@type DungeonInfo[]
     local dungeonInfos = {}
 
@@ -631,6 +633,10 @@ function MPLM_MainFrameMixin:ScanDungeons()
 
         if not instanceId then
             break
+        end
+
+        if not firstInstanceId then
+            firstInstanceId = instanceId
         end
 
         EJ_SelectInstance(instanceId)
@@ -677,6 +683,10 @@ function MPLM_MainFrameMixin:ScanDungeons()
             })
         end
     end
+
+    -- woraround to keep the dungeon journal working
+    EncounterJournal_DisplayInstance(firstInstanceId)
+    EJ_ContentTab_Select(EncounterJournal.selectedTab)
 
     return dungeonInfos
 end
