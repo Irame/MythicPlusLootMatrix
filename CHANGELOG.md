@@ -1,1 +1,1 @@
-- Updated for 11.2.0
+- Fixed missing Items in PSF and Floodgate (and maybe other dungeons too)
