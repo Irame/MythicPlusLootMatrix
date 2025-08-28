@@ -641,7 +641,7 @@ function MPLM_MainFrameMixin:ScanDungeons()
 
         EJ_SelectInstance(instanceId)
 
-        EJ_SetDifficulty(DifficultyUtil.ID.DungeonChallenge)
+        EJ_SetDifficulty(DifficultyUtil.ID.DungeonMythic)
 
         --private.addon:Print("Scanning instance: " .. instanceName)
 
