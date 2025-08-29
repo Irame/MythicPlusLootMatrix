@@ -145,7 +145,8 @@ local function ItemButtonContainerPoolCreate(pool)
 end
 
 function MPLM_MainFrameMixin:OnLoad()
-    self:SetPortraitToAsset([[Interface\EncounterJournal\UI-EJ-PortraitIcon]]);
+    self:SetPortraitToAsset([[Interface\EncounterJournal\UI-EJ-PortraitIcon]])
+    self:SetTitle(L["Mythic+ Loot Matrix"])
 
     self.HideOtherItems:SetLabelText(L["Hide Others"])
 
