@@ -12,6 +12,8 @@ private.addon = addon
 MPLM_MainFrame = MPLM_MainFrame
 
 function addon:OnInitialize()
+    tinsert(UISpecialFrames, MPLM_MainFrame:GetName())
+
     self:RegisterChatCommand("mplm", "ChatCommandHandler");
     private:IntiializeDatabase()
 end
